@@ -1,22 +1,22 @@
 const { DataTypes } = require("sequelize");
 
-const roleModel = (db) => {
-  const Role = db.define("Role", {
-    role_id: {
+const organizationModel = (db) => {
+  const Organization = db.define("Organization", {
+    organization_id: {
       type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true,
       unique: true,
       defaultValue: DataTypes.UUIDV4,
     },
-    role_name: {
+    organization_name: {
       type: DataTypes.STRING,
       unique: true
     },
   });
 
 
-  return Role;
+  return Organization;
 };
 
-module.exports = { roleModel };
+module.exports = { organizationModel };

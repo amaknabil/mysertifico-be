@@ -44,12 +44,6 @@ const userModel = (db) => {
     },
   );
 
-  // User.associate = (models) =>{
-  //   User.belongsToMany(models.Role,{
-  //     through:models.User_Role,
-  //     foreignKey:'user_id'
-  //   })
-  // }
 
   return User;
 };

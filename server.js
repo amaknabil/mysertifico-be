@@ -30,6 +30,7 @@ app.listen(PORT, async () => {
   try {
     await db.sync({
       // force:true
+      // alter:true
     });
     console.log("DB connected successfully");
   } catch {
