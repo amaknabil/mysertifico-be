@@ -1,12 +1,12 @@
 const express = require('express');
 const { getCurrentUserHandler, getAllUserHandler, updateUserHandler } = require('../controllers/user.controller');
-const protect = require('../middleware/auth.middleware');
+const {authMiddleware,protectAndCheckRoleMiddleware} = require('../middleware/auth.middleware');
 const router = express.Router();
 
 
-router.route('/me').get(protect,getCurrentUserHandler);
-router.route('/all').get(protect,getAllUserHandler);
-router.route('/').patch(protect,updateUserHandler)
+router.route('/me/organizations').get(authMiddleware,getCurrentUserHandler);
+router.route('/:organization_id/all').post(protectAndCheckRoleMiddleware('Super Admin'), getAllUserHandler);
+router.route('/').patch(authMiddleware,updateUserHandler)
 
 
 module.exports = router 
