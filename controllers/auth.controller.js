@@ -1,76 +1,36 @@
 const asyncHandler = require("express-async-handler");
 const {
-  createNewUser,
   findOneUser,
   correctPassword,
   createToken,
   createCookieOpt,
 } = require("../services/user.service");
-const { User, Role, User_Role, App } = require("../models");
+const { User} = require("../models");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
 const {
-  JWT_EPIRES_IN,
   JWT_SECRET,
-  JWT_COOKIE_EXPIRES_IN,
-  NODE_ENV,
 } = require("../config/env.config");
 const Email = require("../utils/sendResetPasswordEmail");
-const crypto = require("crypto");
-const sendVerificationEmail = require("../utils/sendVerificationEmail");
 const CustomError = require("../utils/customError");
+const { handleMyWallSignup, handleBoSignup, handleMySertificoSignup } = require("../services/auth.service");
 
 const signUpHandler = asyncHandler(async (req, res) => {
-  const { full_name, email, password, app_name, role_name } = req.body;
+  const { app_name } = req.body;
 
-  if (!full_name || !email || !password || !app_name || !role_name) {
-    throw new CustomError("username,email and password required", 400);
+  switch (app_name) {
+    case "mywall":
+      await handleMyWallSignup(req, res);
+      break;
+    case "bo":
+      await handleBoSignup(req, res);
+      break;
+    case "mysertifico":
+      await handleMySertificoSignup(req, res);
+      break;
+    default:
+      throw new CustomError("Invalid source application specified.", 400);
   }
-
-  const existingUser = await User.findOne({ where: { email } });
-  if (existingUser) {
-    throw new CustomError("Email already Exists", 400);
-  }
-
-  const  role = await Role.findOne({ where: { role_name } });
-  if(!role){
-    throw new CustomError("Role name does not exist", 400);
-  }
-  const app = await App.findOne({ where: { app_name } });
-  if(!app){
-    throw new CustomError("App name does not exist", 400);
-  }
-
-  const salt = await bcryptjs.genSalt(10);
-  const hashedPassword = await bcryptjs.hash(password, salt);
-
-  const verifyToken = crypto.randomBytes(32).toString("hex");
-
-  const user = await createNewUser({
-    full_name,
-    email,
-    password: hashedPassword,
-    verify_token: verifyToken,
-    verify_token_expires_at: Date.now() + 1000 * 60 * 60 * 24, //24h
-  });
-
-  const user_role = await User_Role.create({
-    user_id:user.user_id,
-    role_id:role.role_id,
-    app_id:app.app_id
-
-  })
-
-  // Send Email
-  const verifyUrl = `http://localhost:3000/api/auth/verify?token=${verifyToken}`;
-  await sendVerificationEmail(user.email, user.full_name, verifyUrl);
-
-  res.status(201).json({
-    message: "Account created. Check your email to verify.",
-    data: user,
-    url: verifyUrl,
-    user_role
-  });
 });
 
 const verifyEmailHandler = asyncHandler(async (req, res) => {
