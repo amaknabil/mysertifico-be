@@ -11,8 +11,8 @@ router.route('/forgot-password').post(forgotPasswordHandler);
 router.route('/reset-password/:id/:token').post(resetPasswordHandler);
 router.route('/verify').get(verifyEmailHandler);
 
-router.route('/logout').post(protect,logoutHandeler);
-router.route('/change-password').post(protect,changePasswordHandler);
+router.route('/logout').post(protect.authMiddleware,logoutHandeler);
+router.route('/change-password').post(protect.authMiddleware,changePasswordHandler);
 
 
 module.exports = router

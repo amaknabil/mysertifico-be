@@ -5,15 +5,17 @@ const {
   createToken,
   createCookieOpt,
 } = require("../services/user.service");
-const { User} = require("../models");
+const { User, UserOrganizationRole, Organization, Role } = require("../models");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
-const {
-  JWT_SECRET,
-} = require("../config/env.config");
+const { JWT_SECRET } = require("../config/env.config");
 const Email = require("../utils/sendResetPasswordEmail");
 const CustomError = require("../utils/customError");
-const { handleMyWallSignup, handleBoSignup, handleMySertificoSignup } = require("../services/auth.service");
+const {
+  handleMyWallSignup,
+  handleBoSignup,
+  handleMySertificoSignup,
+} = require("../services/auth.service");
 
 const signUpHandler = asyncHandler(async (req, res) => {
   const { app_name } = req.body;
@@ -32,6 +34,8 @@ const signUpHandler = asyncHandler(async (req, res) => {
       throw new CustomError("Invalid source application specified.", 400);
   }
 });
+
+
 
 const verifyEmailHandler = asyncHandler(async (req, res) => {
   const { token } = req.query;
@@ -60,11 +64,18 @@ const loginHandler = asyncHandler(async (req, res) => {
   }
 
   //Find user
-  const user = await findOneUser({ email, is_active: 1 });
+  const user = await findOneUser({ email });
   if (!user) {
     throw new CustomError(
       "Invalid email or password or user does not exist",
       401
+    );
+  }
+
+  if (!user.is_active) {
+    throw new CustomError(
+      "Account not verified. Please check your email.",
+      403
     );
   }
 
