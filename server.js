@@ -5,12 +5,14 @@ const router = require("./routes");
 const cookieParser = require("cookie-parser");
 const CustomError = require("./utils/customError");
 const globalErrorHandler = require("./controllers/error.controller");
+const orgRoutes = require('./routes/orgRoutes');
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api", router);
+app.use('/api', orgRoutes);
 
 // global error handler for non-exist route
 app.all("/*splat", (req, res, next) => {

@@ -6,7 +6,7 @@ const contactUsRouter = require('./contactUs.route');
 const {authMiddleware} = require('../middleware/auth.middleware');
 const appRouter = require('./app.route');
 const roleRouter = require('./role.route');
-const organizationRouter = require('./organizarion.route');
+const organizationRouter = require('./orgRoutes');
 
 router.use('/auth', authRouter);
 router.use('/users',authMiddleware, userRouter);
