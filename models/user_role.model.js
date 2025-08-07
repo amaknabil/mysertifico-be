@@ -15,6 +15,11 @@ const userRoleModel = (db) => {
         primaryKey: true,
         // references: { model: Role, key: "role_id" },
       },
+      is_active:{
+        type:DataTypes.BOOLEAN,
+        allowNull:false,
+        defaultValue:true
+      }
     },
     {
       tableName: "user_roles",

@@ -5,6 +5,7 @@ const { User, UserOrganizationRole, Role, Organization } = require("../models");
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
 const Email = require("../utils/sendInviteEmail");
+const { Op } = require("sequelize");
 
 const inviteUserHandler = asyncHandler(async (req, res) => {
   const { full_name, email, role_name } = req.body;
@@ -26,13 +27,16 @@ const inviteUserHandler = asyncHandler(async (req, res) => {
   // --- Block 1: Database Operations ---
   try {
     user = await User.findOne({ where: { email: email } });
-    
+
     if (user) {
       const isAlreadyMember = await UserOrganizationRole.findOne({
         where: { user_id: user.user_id, organization_id: organization_id },
       });
       if (isAlreadyMember) {
-        throw new CustomError("This user is already a member of this organization.", 409);
+        throw new CustomError(
+          "This user is already a member of this organization.",
+          409
+        );
       }
     }
 
@@ -41,13 +45,16 @@ const inviteUserHandler = asyncHandler(async (req, res) => {
       const hashedPassword = await bcryptjs.hash(temporaryPassword, 12);
       verifyToken = crypto.randomBytes(32).toString("hex");
 
-      user = await User.create({
-        full_name,
-        email,
-        password: hashedPassword,
-        verify_token: verifyToken,
-        verify_token_expires_at: Date.now() + 1000 * 60 * 60 * 24
-      }, { transaction });
+      user = await User.create(
+        {
+          full_name,
+          email,
+          password: hashedPassword,
+          verify_token: verifyToken,
+          verify_token_expires_at: Date.now() + 1000 * 60 * 60 * 24,
+        },
+        { transaction }
+      );
     }
 
     organization = await Organization.findByPk(organization_id);
@@ -56,21 +63,23 @@ const inviteUserHandler = asyncHandler(async (req, res) => {
     if (!organization || !role) {
       throw new CustomError("Invalid organization or role specified.", 404);
     }
-    
-    await UserOrganizationRole.create({
-      user_id: user.user_id,
-      organization_id: organization_id,
-      role_id: role.role_id,
-    }, { transaction });
+
+    await UserOrganizationRole.create(
+      {
+        user_id: user.user_id,
+        organization_id: organization_id,
+        role_id: role.role_id,
+      },
+      { transaction }
+    );
 
     // If all database operations succeed, commit the transaction.
     await transaction.commit();
-
   } catch (error) {
     // If any database operation fails, roll everything back.
-    if(transaction) await transaction.rollback();
+    if (transaction) await transaction.rollback();
     // Re-throw the error to be handled by your global error handler
-    throw error; 
+    throw error;
   }
 
   // --- Block 2: External Service Call (Email) ---
@@ -109,7 +118,7 @@ const inviteUserHandler = asyncHandler(async (req, res) => {
   // --- Block 3: Success Response ---
   // Send the final success response, regardless of whether the email sent.
   res.status(201).json({
-    message: `${user.full_name} has been successfully invited to ${organization.organization_name} as a(n) ${role.role_name}.`
+    message: `${user.full_name} has been successfully invited to ${organization.organization_name} as a(n) ${role.role_name}.`,
   });
 });
 
@@ -128,8 +137,67 @@ const verifyUserOrganization = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     message: "Successfully created",
-
   });
 });
 
-module.exports = { inviteUserHandler, verifyUserOrganization };
+const getAllOrganization = asyncHandler(async (req, res) => {
+  // --- 1. Pagination ---
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10; // Default to 10 per page
+  const offset = (page - 1) * limit;
+
+  // --- 2. Optional Search ---
+  const { search } = req.query;
+  const whereClause = {};
+  if (search) {
+    whereClause.organization_name = { [Op.like]: `%${search}%` };
+  }
+
+  // --- 3. Fetch Data ---
+  const { count, rows: organizations } = await Organization.findAndCountAll({
+    where: whereClause,
+    limit: limit,
+    offset: offset,
+    order: [["organization_name", "ASC"]], // Order alphabetically
+  });
+
+  // --- 4. Send Response ---
+  res.status(200).json({
+    status: "success",
+    data: {
+      totalOrganizations: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      organizations: organizations,
+    },
+  });
+});
+
+//change organisation is_active/status
+const updateOrganizationStatus = asyncHandler(async (req, res) => {
+  const { organization_id } = req.params;
+
+  const organization = await Organization.findOne({
+    where: { organization_id: organization_id },
+  });
+
+  if (!organization) {
+    throw new CustomError("There is no organization with that id");
+  }
+
+  organization.is_active = !organization.is_active;
+
+  await organization.save();
+
+  res.status(200).json({
+    status: "success",
+    data: organization,
+  });
+});
+
+module.exports = {
+  inviteUserHandler,
+  verifyUserOrganization,
+  getAllOrganization,
+  updateOrganizationStatus,
+};

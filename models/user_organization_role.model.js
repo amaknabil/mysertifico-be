@@ -21,6 +21,11 @@ const userOrganizationRoleModel = (db) => {
         // references: { model: Role, key: "role_id" },
       },
       details: { type: DataTypes.JSON },
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
     },
     {
       tableName: "user_organization_roles",
