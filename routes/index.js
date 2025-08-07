@@ -6,7 +6,9 @@ const contactUsRouter = require('./contactUs.route');
 const {authMiddleware} = require('../middleware/auth.middleware');
 const appRouter = require('./app.route');
 const roleRouter = require('./role.route');
-const organizationRouter = require('./organizarion.route');
+const organizationRouter = require('./organization.route');
+const myWallRouter = require('./mywall.route');
+const boRouter = require('./bo.route');
 
 router.use('/auth', authRouter);
 router.use('/users',authMiddleware, userRouter);
@@ -14,5 +16,7 @@ router.use('/contact-us',contactUsRouter);
 router.use('/apps',appRouter);
 router.use('/roles', roleRouter);
 router.use('/organizations', organizationRouter);
+router.use('/mywall',myWallRouter);
+router.use('/bo',boRouter);
 
 module.exports = router 

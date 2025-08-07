@@ -11,10 +11,14 @@ const organizationModel = (db) => {
     },
     organization_name: {
       type: DataTypes.STRING,
-      unique: true
+      unique: true,
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
   });
-
 
   return Organization;
 };

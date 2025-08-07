@@ -31,6 +31,13 @@ Role.belongsTo(App, { foreignKey: 'app_id' });
 User.belongsToMany(Role, { through: UserRole, foreignKey: 'user_id' });
 Role.belongsToMany(User, { through: UserRole, foreignKey: 'role_id' });
 
+User.hasMany(UserRole, { foreignKey: 'user_id' });
+UserRole.belongsTo(User, { foreignKey: 'user_id' });
+
+Role.hasMany(UserRole, { foreignKey: 'role_id' });
+UserRole.belongsTo(Role, { foreignKey: 'role_id' });
+
+
 // User <--> Organization <--> Role (for MyCertifico, using its own model)
 User.hasMany(UserOrganizationRole, { foreignKey: 'user_id' });
 UserOrganizationRole.belongsTo(User, { foreignKey: 'user_id' });
