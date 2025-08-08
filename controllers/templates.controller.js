@@ -1,13 +1,24 @@
 const db = require('../models');
 
-// Controller function to get all templates
+// Controller function to get all templates with pagination
 exports.getAllTemplates = async (req, res) => {
   try {
-    // Call the findAll method on the Template model to retrieve all records.
-    const templates = await db.Template.findAll();
+    // Get page and limit from query parameters, with default values
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 12; // Use a default limit of 12
+    const offset = (page - 1) * limit;
+
+    // Use Sequelize's findAll method with limit and offset for pagination
+    // include: [{ model: db.User }], // Example of including a related model
+    const templates = await db.Template.findAll({
+      limit: limit,
+      offset: offset,
+    });
 
     res.status(200).json({
       success: true,
+      page: page,
+      limit: limit,
       data: templates,
     });
   } catch (error) {
@@ -23,7 +34,6 @@ exports.getAllTemplates = async (req, res) => {
 // Controller function to get the count of all templates
 exports.countAllTemplates = async (req, res) => {
   try {
-    // Call the count method on the Template model to get the total number of records.
     const totalCount = await db.Template.count();
 
     res.status(200).json({
