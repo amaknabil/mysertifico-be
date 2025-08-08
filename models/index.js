@@ -8,6 +8,7 @@ const { appModel } = require("./app.model");
 const { organizationModel } = require("./organization.model");
 const { certificateModel } = require("./certificate.model");
 const { userOrganizationRoleModel } = require("./user_organization_role.model");
+const { templateModel } = require("./templates.model");
 
 const App = appModel(db);
 const Certificate = certificateModel(db);
@@ -18,6 +19,7 @@ const Role  = roleModel(db);
 const UserRole = userRoleModel(db);
 const UserOrganizationRole = userOrganizationRoleModel(db);
 const User = userModel(db);
+const Template = templateModel(db);
 
 
 
@@ -55,5 +57,5 @@ UserOrganizationRole.belongsTo(Role, { foreignKey: 'role_id' });
 
 
 
-module.exports = {User,ContactUs, Role,Logo,App,UserRole,Organization, UserOrganizationRole,Certificate}
+module.exports = {User,ContactUs, Role,Logo,App,UserRole,Organization, UserOrganizationRole,Certificate, Template}
 

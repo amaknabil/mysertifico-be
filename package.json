@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
@@ -23,5 +23,14 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amaknabil/mysertifico-be.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amaknabil/mysertifico-be/issues"
+  },
+  "homepage": "https://github.com/amaknabil/mysertifico-be#readme",
+  "description": ""
 }
