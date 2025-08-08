@@ -6,11 +6,14 @@ const {roleModel} = require('./role.model');
 const {logoModel} = require('./logo.model');
 const { appModel } = require("./app.model");
 const { organizationModel } = require("./organization.model");
-const { certificateModel } = require("./certificate.model");
+const { recipientModel } = require("./certificate_recipient.model");
+const {batchModel} = require('./certificate_batch.model');
 const { userOrganizationRoleModel } = require("./user_organization_role.model");
+const { templateModel } = require("./template.model");
 
 const App = appModel(db);
-const Certificate = certificateModel(db);
+const Batch = batchModel(db);
+const Recipient = recipientModel(db);
 const ContactUs = contactUsModel(db);
 const Logo  = logoModel(db);
 const Organization = organizationModel(db);
@@ -18,6 +21,8 @@ const Role  = roleModel(db);
 const UserRole = userRoleModel(db);
 const UserOrganizationRole = userOrganizationRoleModel(db);
 const User = userModel(db);
+const Template = templateModel(db);
+
 
 
 
@@ -48,6 +53,23 @@ UserOrganizationRole.belongsTo(Organization, { foreignKey: 'organization_id' });
 Role.hasMany(UserOrganizationRole, { foreignKey: 'role_id' });
 UserOrganizationRole.belongsTo(Role, { foreignKey: 'role_id' });
 
+//User <--> Recipient <-->  Batch <--> Organization
+
+//one user has many certificate_recipients
+User.hasMany(Recipient,{foreignKey:'user_id'});
+Recipient.belongsTo(User,{foreignKey:'user_id'});
+
+//one batch has many recipient
+Batch.hasMany(Recipient,{foreignKey:'batch_id'});
+Recipient.belongsTo(Batch,{foreignKey:'batch_id'});
+
+//one user can create many certificate_batches
+User.hasMany(Batch,{foreignKey:'creator_id'});
+Batch.belongsTo(User,{foreignKey:'creator_id'});
+
+//one org can have many certificate_batches
+Organization.hasMany(Batch,{foreignKey:'organization_id'});
+Batch.belongsTo(Organization,{foreignKey:'organization_id'});
 
 
 
@@ -55,5 +77,6 @@ UserOrganizationRole.belongsTo(Role, { foreignKey: 'role_id' });
 
 
 
-module.exports = {User,ContactUs, Role,Logo,App,UserRole,Organization, UserOrganizationRole,Certificate}
+
+module.exports = {User,ContactUs, Role,Logo,App,UserRole,Organization, UserOrganizationRole,Batch , Recipient,Template}
 

@@ -9,6 +9,8 @@ const roleRouter = require('./role.route');
 const organizationRouter = require('./organization.route');
 const myWallRouter = require('./mywall.route');
 const boRouter = require('./bo.route');
+const certificateRouter = require('./certificate.route');
+const templateRouter = require('./template.route'); 
 
 router.use('/auth', authRouter);
 router.use('/users',authMiddleware, userRouter);
@@ -18,5 +20,7 @@ router.use('/roles', roleRouter);
 router.use('/organizations', organizationRouter);
 router.use('/mywall',myWallRouter);
 router.use('/bo',boRouter);
+router.use('/certificates',certificateRouter);
+router.use('/templates', templateRouter);
 
 module.exports = router 
