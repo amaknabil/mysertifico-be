@@ -10,7 +10,8 @@ const organizationRouter = require('./organization.route');
 const myWallRouter = require('./mywall.route');
 const boRouter = require('./bo.route');
 const certificateRouter = require('./certificate.route');
-const templateRouter = require('./template.route'); 
+const templateRouter = require('./template.route');
+const logoRouter = require('./logo.route');
 
 router.use('/auth', authRouter);
 router.use('/users',authMiddleware, userRouter);
@@ -22,5 +23,6 @@ router.use('/mywall',myWallRouter);
 router.use('/bo',boRouter);
 router.use('/certificates',certificateRouter);
 router.use('/templates', templateRouter);
+router.use('/logos', logoRouter);
 
 module.exports = router 
