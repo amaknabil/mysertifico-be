@@ -12,8 +12,7 @@ const boRouter = require('./bo.route');
 const certificateRouter = require('./certificate.route');
 const templateRouter = require('./template.route');
 const logoRouter = require('./logo.route');
-const swaggerUi = require("swagger-ui-express");
-const { swaggerSpecification } = require("../config/swagger.config");
+
 
 router.use('/auth', authRouter);
 router.use('/users',authMiddleware, userRouter);
