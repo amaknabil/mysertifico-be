@@ -15,6 +15,7 @@ const logoRouter = require('./logo.route');
 const swaggerUi = require('swagger-ui-express');
 const {  swaggerSpecification } = require('../config/swagger.config');
 
+
 router.use('/auth', authRouter);
 router.use('/users',authMiddleware, userRouter);
 router.use('/contact-us',contactUsRouter);
@@ -26,6 +27,7 @@ router.use('/bo',boRouter);
 router.use('/certificates',certificateRouter);
 router.use('/templates', templateRouter);
 router.use('/logos', logoRouter);
+router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecification));
 
 
 
