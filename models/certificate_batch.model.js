@@ -1,5 +1,80 @@
 const { DataTypes } = require("sequelize")
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     BatchResponse:
+ *       type: object
+ *       properties:
+ *         batch_id:
+ *           type: string
+ *           format: uuid
+ *         template_id:
+ *           type: string
+ *           format: uuid
+ *         organization_id:
+ *           type: string
+ *           format: uuid
+ *         creator_id:
+ *           type: string
+ *           format: uuid
+ *         title:
+ *           type: string
+ *         status:
+ *           type: string
+ *         issued_at:
+ *           type: string
+ *           format: date-time
+ *
+ *     CreateBatchDto:
+ *       type: object
+ *       required:
+ *         - organization_id
+ *         - template_id
+ *         - title
+ *         - list_recipient_id
+ *       properties:
+ *         organization_id:
+ *           type: string
+ *           format: uuid
+ *           description: The ID of the issuing organization.
+ *         template_id:
+ *           type: string
+ *           format: uuid
+ *           description: The ID of the certificate template to use.
+ *         title:
+ *           type: string
+ *           description: A descriptive title for this batch (e.g., "Q3 Graduates").
+ *           example: "Q3 Advanced JavaScript Graduates"
+ *         list_recipient_id:
+ *           type: array
+ *           description: An array of user_ids for the recipients.
+ *           items:
+ *             type: string
+ *             format: uuid
+ *
+ *     BatchSummaryResponse:
+ *       type: object
+ *       properties:
+ *         batchName:
+ *           type: string
+ *           example: "Q3 Advanced Graduates"
+ *         issueDate:
+ *           type: string
+ *           format: date-time
+ *         recipientCount:
+ *           type: integer
+ *           example: 150
+ *
+ *     Organization:
+ *       type: object
+ *       properties:
+ *         organization_name:
+ *           type: string
+ *           example: "My Awesome Company"
+ */
+
 
 const batchModel = (db) => {
     const Batch = db.define('Batch',{
