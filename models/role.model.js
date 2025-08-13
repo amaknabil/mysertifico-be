@@ -11,7 +11,6 @@ const roleModel = (db) => {
     },
     role_name: {
       type: DataTypes.STRING,
-      unique: true
     },
   });
 

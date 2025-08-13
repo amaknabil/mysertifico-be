@@ -1,5 +1,5 @@
-const { Logo } = require('../models');
-const CustomError = require('../utils/customError');
+const { Logo } = require("../models");
+const CustomError = require("../utils/customError");
 const { Op } = require("sequelize");
 
 // Get all logos with pagination and search
@@ -19,14 +19,14 @@ exports.getAllLogos = async (req, res, next) => {
       // Add a search condition for the 'name' query parameter
       if (name) {
         searchConditions[Op.or].push({
-          file_name: { [Op.like]: `%${name}%` }
+          file_name: { [Op.like]: `%${name}%` },
         });
       }
 
       // Add a search condition for the 'id' query parameter
       if (id) {
         searchConditions[Op.or].push({
-          logo_id: id
+          logo_id: id,
         });
       }
     }
@@ -47,7 +47,7 @@ exports.getAllLogos = async (req, res, next) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve logos.',
+      message: "Failed to retrieve logos.",
       error: error.message,
     });
   }
@@ -60,14 +60,14 @@ exports.createLogo = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Logo created successfully.',
+      message: "Logo created successfully.",
       data: newLogo,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create new logo.',
+      message: "Failed to create new logo.",
       error: error.message,
     });
   }
@@ -91,7 +91,7 @@ exports.getLogoById = async (req, res, next) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve logo.',
+      message: "Failed to retrieve logo.",
       error: error.message,
     });
   }
@@ -106,21 +106,23 @@ exports.updateLogo = async (req, res, next) => {
     });
 
     if (updatedRowsCount === 0) {
-      return next(new CustomError(`Logo with ID ${id} not found for update`, 404));
+      return next(
+        new CustomError(`Logo with ID ${id} not found for update`, 404)
+      );
     }
 
     const updatedLogo = await Logo.findByPk(id);
 
     res.status(200).json({
       success: true,
-      message: 'Logo updated successfully.',
+      message: "Logo updated successfully.",
       data: updatedLogo,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update logo.',
+      message: "Failed to update logo.",
       error: error.message,
     });
   }
@@ -135,7 +137,9 @@ exports.deleteLogo = async (req, res, next) => {
     });
 
     if (deletedRowCount === 0) {
-      return next(new CustomError(`Logo with ID ${id} not found for deletion`, 404));
+      return next(
+        new CustomError(`Logo with ID ${id} not found for deletion`, 404)
+      );
     }
 
     res.status(204).end();
@@ -143,7 +147,7 @@ exports.deleteLogo = async (req, res, next) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete logo.',
+      message: "Failed to delete logo.",
       error: error.message,
     });
   }

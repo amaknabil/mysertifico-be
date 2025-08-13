@@ -9,7 +9,6 @@ const {
 const CustomError = require("../utils/customError");
 const { Op } = require("sequelize");
 
-
 const getUserHandler = asyncHandler(async (req, res) => {
   // --- 1. Pagination (applies to both getting all and searching) ---
   const page = parseInt(req.query.page, 10) || 1;
@@ -159,5 +158,4 @@ module.exports = {
   getUserHandler,
   updateUserHandler,
   updateUserStatusHandler,
-
 };

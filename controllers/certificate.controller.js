@@ -78,10 +78,7 @@ const getAllCertificateBatches = asyncHandler(async (req, res) => {
       ["batch_id", "batchId"],
       ["title", "batchName"],
       ["issued_at", "issueDate"],
-      [
-        db.fn("COUNT", db.col("Recipients.recipient_id")),
-        "recipientCount",
-      ],
+      [db.fn("COUNT", db.col("Recipients.recipient_id")), "recipientCount"],
     ],
     include: [
       {
@@ -115,17 +112,20 @@ const getAllCertificateBatches = asyncHandler(async (req, res) => {
       batches: batches,
     },
   });
-
 });
 
-const getSummaryCertificate = asyncHandler(async(req,res) =>{
-    const certificates = await Recipient.findAll();
-    const total = certificates.length
+const getSummaryCertificate = asyncHandler(async (req, res) => {
+  const certificates = await Recipient.findAll();
+  const total = certificates.length;
 
-    res.status(200).json({
-        status:'success',
-        data:total
-    })
-})
+  res.status(200).json({
+    status: "success",
+    data: total,
+  });
+});
 
-module.exports = { getAllCertificateBatches, createCertificateHandler ,getSummaryCertificate};
+module.exports = {
+  getAllCertificateBatches,
+  createCertificateHandler,
+  getSummaryCertificate,
+};
