@@ -1,7 +1,23 @@
-const { DataTypes } = require("sequelize");
+"use strict";
+const { Model } = require("sequelize");
 
-const roleModel = (db) => {
-  const Role = db.define("Role", {
+module.exports = (sequelize, DataTypes) => {
+  class Role extends Model {
+    static associate(models) {
+      Role.hasMany(models.UserOrganizationRole, { foreignKey: "role_id" });
+
+      Role.belongsTo(models.App, { foreignKey: "app_id" });
+
+      Role.belongsToMany(models.User, {
+        through: models.UserRole,
+        foreignKey: "role_id",
+      });
+
+      Role.hasMany(models.UserRole, { foreignKey: "role_id" });
+    }
+  }
+
+  Role.init({
     role_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -11,12 +27,32 @@ const roleModel = (db) => {
     },
     role_name: {
       type: DataTypes.STRING,
-      unique: true
     },
-  });
+  },{
+    sequelize,
+    modelName:'Role',
+    tableName:'roles'
 
+  });
 
   return Role;
 };
 
-module.exports = { roleModel };
+// const roleModel = (db) => {
+//   const Role = db.define("Role", {
+//     role_id: {
+//       type: DataTypes.UUID,
+//       allowNull: false,
+//       primaryKey: true,
+//       unique: true,
+//       defaultValue: DataTypes.UUIDV4,
+//     },
+//     role_name: {
+//       type: DataTypes.STRING,
+//     },
+//   });
+
+//   return Role;
+// };
+
+// module.exports = { roleModel };

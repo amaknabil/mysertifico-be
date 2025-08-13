@@ -37,7 +37,7 @@ const getMyWallUsersHandler = asyncHandler(async (req, res) => {
       {
         model: Role,
         required: true,
-        attributes: ["role_name","role_id"],
+        attributes: ["role_name", "role_id"],
         include: [
           {
             model: App,
@@ -80,26 +80,25 @@ const getMyWallUsersHandler = asyncHandler(async (req, res) => {
   });
 });
 
-
 //change mywall status from inactive to active and vice versa
-const updateMyWallUserStatus = asyncHandler(async(req,res) =>{
-    const {user_id,role_id} = req.params;
+const updateMyWallUserStatus = asyncHandler(async (req, res) => {
+  const { user_id, role_id } = req.params;
 
-    const user = await UserRole.findOne({
-        where:{user_id:user_id, role_id:role_id} 
-    });
+  const user = await UserRole.findOne({
+    where: { user_id: user_id, role_id: role_id },
+  });
 
-    if(!user){
-        throw new CustomError('There is no user with that id and role id');
-    }
+  if (!user) {
+    throw new CustomError("There is no user with that id and role id");
+  }
 
-    user.is_active = !user.is_active;
+  user.is_active = !user.is_active;
 
-    await user.save();
+  await user.save();
 
-    res.status(200).json({
-        status:`succes change status for this user to ${user.is_active}`
-    })
-})
+  res.status(200).json({
+    status: `succes change status for this user to ${user.is_active}`,
+  });
+});
 
-module.exports = { getMyWallUsersHandler,updateMyWallUserStatus };
+module.exports = { getMyWallUsersHandler, updateMyWallUserStatus };

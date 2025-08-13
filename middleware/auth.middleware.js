@@ -26,35 +26,35 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     return next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {
-    throw new CustomError("Authentication token required", 401);
-      
+      throw new CustomError("Authentication token required", 401);
     }
     throw new CustomError("Invalid authentication token", 401);
   }
 });
 
 // api/me/:organisation_id
-const protectAndCheckRoleMiddleware = (requiredRole) =>{
-  return asyncHandler(async (req, res,next) => {
-  const user_id = req.user.user_id;
-  const org_id = req.params.organization_id;
+const protectAndCheckRoleMiddleware = (requiredRole) => {
+  return asyncHandler(async (req, res, next) => {
+    const user_id = req.user.user_id;
+    const org_id = req.params.organization_id;
 
-  const userOrgRole = await UserOrganizationRole.findOne({
-    where: { user_id: user_id, organization_id: org_id },
-    include: { model: Role },
+    const userOrgRole = await UserOrganizationRole.findOne({
+      where: { user_id: user_id, organization_id: org_id },
+      include: { model: Role },
+    });
+    // if(true){
+    //   throw new CustomError(`${requiredRole} hi`,400)
+    // }
+
+    if (!userOrgRole || userOrgRole.Role.role_name !== requiredRole) {
+      throw new CustomError(
+        `You do not have permission to perform this action.${user_id}, ${org_id}, ${userOrgRole.Role.role_name},${requiredRole}`,
+        403
+      );
+    }
+
+    next();
   });
-  // if(true){
-  //   throw new CustomError(`${requiredRole} hi`,400)
-  // }
+};
 
-  if(!userOrgRole || userOrgRole.Role.role_name !== requiredRole){
-    throw new CustomError(`You do not have permission to perform this action.${user_id}, ${org_id}, ${userOrgRole.Role.role_name},${requiredRole}`, 403);
-  }
-  
-
-  next();
-});
-}
-
-
-module.exports = {authMiddleware,protectAndCheckRoleMiddleware};
+module.exports = { authMiddleware, protectAndCheckRoleMiddleware };

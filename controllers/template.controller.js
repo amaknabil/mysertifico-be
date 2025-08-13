@@ -1,7 +1,6 @@
 const { Template } = require("../models");
-const CustomError = require('../utils/customError');
+const CustomError = require("../utils/customError");
 const { Op } = require("sequelize");
-
 
 // Controller function to get all templates with pagination and search
 exports.getAllTemplates = async (req, res) => {
@@ -11,7 +10,7 @@ exports.getAllTemplates = async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 12;
     const offset = (page - 1) * limit;
 
-     // Build a dynamic search condition object
+    // Build a dynamic search condition object
     const searchConditions = {};
     const { name, id } = req.query;
 
@@ -23,19 +22,18 @@ exports.getAllTemplates = async (req, res) => {
       if (name) {
         // Add the condition for searching by title (partial match)
         searchConditions[Op.or].push({
-          title: { [Op.like]: `%${name}%` }
+          title: { [Op.like]: `%${name}%` },
         });
       }
 
       if (id) {
         // Add the condition for searching by template_id (exact match)
         searchConditions[Op.or].push({
-          template_id: id
+          template_id: id,
         });
       }
     }
 
-    
     // Execute the database query with the search and pagination conditions
     const templates = await db.Template.findAll({
       where: searchConditions,
@@ -52,7 +50,7 @@ exports.getAllTemplates = async (req, res) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve templates.',
+      message: "Failed to retrieve templates.",
       error: error.message,
     });
   }
@@ -72,7 +70,7 @@ exports.countAllTemplates = async (req, res) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to count templates.',
+      message: "Failed to count templates.",
       error: error.message,
     });
   }
@@ -85,14 +83,14 @@ exports.createTemplate = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Template created successfully.',
+      message: "Template created successfully.",
       data: newTemplate,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create new template.',
+      message: "Failed to create new template.",
       error: error.message,
     });
   }
@@ -116,7 +114,7 @@ exports.getTemplateById = async (req, res, next) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve template.',
+      message: "Failed to retrieve template.",
       error: error.message,
     });
   }
@@ -131,7 +129,9 @@ exports.updateTemplate = async (req, res, next) => {
     });
 
     if (updatedRowsCount === 0) {
-      return next(new CustomError(`Template with ID ${id} not found for update`, 404));
+      return next(
+        new CustomError(`Template with ID ${id} not found for update`, 404)
+      );
     }
 
     // Since MySQL doesn't have the 'returning' option,
@@ -140,14 +140,14 @@ exports.updateTemplate = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'Template updated successfully.',
+      message: "Template updated successfully.",
       data: updatedTemplate,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update template.',
+      message: "Failed to update template.",
       error: error.message,
     });
   }
@@ -162,7 +162,9 @@ exports.deleteTemplate = async (req, res, next) => {
     });
 
     if (deletedRowCount === 0) {
-      return next(new CustomError(`Template with ID ${id} not found for deletion`, 404));
+      return next(
+        new CustomError(`Template with ID ${id} not found for deletion`, 404)
+      );
     }
 
     // A 204 No Content status code is standard for a successful deletion.
@@ -171,7 +173,7 @@ exports.deleteTemplate = async (req, res, next) => {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to delete template.',
+      message: "Failed to delete template.",
       error: error.message,
     });
   }

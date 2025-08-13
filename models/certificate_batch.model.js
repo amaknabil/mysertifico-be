@@ -1,4 +1,6 @@
-const { DataTypes } = require("sequelize")
+// const { DataTypes } = require("sequelize")
+"use strict";
+const { Model } = require("sequelize");
 
 /**
  * @openapi
@@ -75,43 +77,99 @@ const { DataTypes } = require("sequelize")
  *           example: "My Awesome Company"
  */
 
+module.exports = (sequelize, DataTypes) => {
+  class Batch extends Model {
+    static associate(models) {
+      //one batch has many recipient
+      Batch.hasMany(models.Recipient, { foreignKey: "batch_id" });
 
-const batchModel = (db) => {
-    const Batch = db.define('Batch',{
-        batch_id:{
-            type:DataTypes.UUID,
-            primaryKey:true,
-            defaultValue:DataTypes.UUIDV4
-        },
-        template_id:{
-            type:DataTypes.UUID,
-            allowNull:false,
-            defaultValue:DataTypes.UUIDV4
-        },
-        organization_id:{
-            type:DataTypes.UUID,
-            allowNull:false
-        },
-        creator_id:{
-             type:DataTypes.UUID,
-             allowNull:false
-        },
-        title:{
-            type:DataTypes.STRING,
-            allowNull:false
-        },
-        status:{
-            type:DataTypes.STRING,
-            allowNull:false
-        }
-    },{
+      //one user can create many certificate_batches
+      Batch.belongsTo(models.User, { foreignKey: "creator_id" });
+
+      //one org can have many certificate_batches
+      Batch.belongsTo(models.Organization, { foreignKey: "organization_id" });
+    }
+  }
+
+  Batch.init(
+    {
+      batch_id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+      },
+      template_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        defaultValue: DataTypes.UUIDV4,
+      },
+      organization_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      creator_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
       tableName: "certificate_batches",
       timestamps: true,
       createdAt: "issued_at",
       updatedAt: false,
-    })
+      modelName:'Batch'
+    }
+  );
 
-    return Batch
-}
+  return Batch;
+};
 
-module.exports = { batchModel}
+
+// const batchModel = (db) => {
+//     const Batch = db.define('Batch',{
+//         batch_id:{
+//             type:DataTypes.UUID,
+//             primaryKey:true,
+//             defaultValue:DataTypes.UUIDV4
+//         },
+//         template_id:{
+//             type:DataTypes.UUID,
+//             allowNull:false,
+//             defaultValue:DataTypes.UUIDV4
+//         },
+//         organization_id:{
+//             type:DataTypes.UUID,
+//             allowNull:false
+//         },
+//         creator_id:{
+//              type:DataTypes.UUID,
+//              allowNull:false
+//         },
+//         title:{
+//             type:DataTypes.STRING,
+//             allowNull:false
+//         },
+//         status:{
+//             type:DataTypes.STRING,
+//             allowNull:false
+//         }
+//     },{
+//       tableName: "certificate_batches",
+//       timestamps: true,
+//       createdAt: "issued_at",
+//       updatedAt: false,
+//     })
+
+//     return Batch
+// }
+
+// module.exports = { batchModel}

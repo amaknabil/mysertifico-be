@@ -47,8 +47,21 @@ const { DataTypes } = require("sequelize");
  *           example: "Issuer"
  */
 
-const organizationModel = (db) => {
-  const Organization = db.define("Organization", {
+("use strict");
+const { Model } = require("sequelize");
+
+module.exports = (sequelize, DataTypes) => {
+  class Organization extends Model {
+    static associate(models) {
+      //list of all association
+      Organization.hasMany(models.Batch, { foreignKey: "organization_id" });
+      Organization.hasMany(models.UserOrganizationRole, {
+        foreignKey: "organization_id",
+      });
+    }
+  }
+
+  Organization.init({
     organization_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -65,9 +78,37 @@ const organizationModel = (db) => {
       allowNull: false,
       defaultValue: true,
     },
+  },{
+    sequelize,
+    modelName: 'Organization',
+    tableName:'organizations'
   });
-
+  
   return Organization;
 };
 
-module.exports = { organizationModel };
+
+// const organizationModel = (db) => {
+//   const Organization = db.define("Organization", {
+//     organization_id: {
+//       type: DataTypes.UUID,
+//       allowNull: false,
+//       primaryKey: true,
+//       unique: true,
+//       defaultValue: DataTypes.UUIDV4,
+//     },
+//     organization_name: {
+//       type: DataTypes.STRING,
+//       unique: true,
+//     },
+//     is_active: {
+//       type: DataTypes.BOOLEAN,
+//       allowNull: false,
+//       defaultValue: true,
+//     },
+//   });
+
+//   return Organization;
+// };
+
+// module.exports = { organizationModel };

@@ -1,8 +1,17 @@
-const { DataTypes } = require("sequelize");
+// const { DataTypes } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 
-const userRoleModel = (db) => {
-  return db.define(
-    "User_Role",
+module.exports = (sequelize, DataTypes) => {
+  class UserRole extends Model{
+    static associate(models){
+      UserRole.belongsTo(models.User, { foreignKey: 'user_id' });
+      
+      UserRole.belongsTo(models.Role, { foreignKey: 'role_id' });
+
+    }
+  }
+  UserRole.init(
     {
       // This is for MyWall & BO roles (no extra attributes)
       user_id: {
@@ -22,12 +31,16 @@ const userRoleModel = (db) => {
       }
     },
     {
+      sequelize,
+      modelName:'UserRole',
       tableName: "user_roles",
       timestamps: true,
       createdAt: "assigned_at",
       updatedAt: false,
     }
   );
+
+  return UserRole
 };
 
-module.exports = { userRoleModel };
+

@@ -5,7 +5,7 @@ const {
   createToken,
   createCookieOpt,
 } = require("../services/user.service");
-const { User, UserOrganizationRole, Organization, Role } = require("../models");
+const { User } = require("../models");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
 const { JWT_SECRET } = require("../config/env.config");
@@ -34,8 +34,6 @@ const signUpHandler = asyncHandler(async (req, res) => {
       throw new CustomError("Invalid source application specified.", 400);
   }
 });
-
-
 
 const verifyEmailHandler = asyncHandler(async (req, res) => {
   const { token } = req.query;

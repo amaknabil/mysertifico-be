@@ -1,7 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const CustomError = require("../utils/customError");
 const { db } = require("../config/db.config");
-const { User, UserOrganizationRole, Role, Organization } = require("../models");
+const {
+  User,
+  UserOrganizationRole,
+  Role,
+  Organization,
+} = require("../models");
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
 const Email = require("../utils/sendInviteEmail");

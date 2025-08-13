@@ -1,4 +1,6 @@
-const { DataTypes } = require("sequelize");
+// const { DataTypes } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 
 /**
  * @openapi
@@ -41,9 +43,11 @@ const { DataTypes } = require("sequelize");
  *         - blanko_url
  */
 
-const templateModel = (db) => {
-  const Template = db.define(
-    "Template",
+module.exports = (sequelize, DataTypes) => {
+  class Template extends Model{
+
+  }
+  Template.init(
     {
       template_id: {
         type: DataTypes.STRING,
@@ -76,10 +80,56 @@ const templateModel = (db) => {
       elements_data: {
         type: DataTypes.TEXT, // Using TEXT for potentially large JSON data
       },
-    },
+    },{
+      sequelize,
+      tableName:'templates',
+      modelName:'Template'
+    }
   );
 
   return Template;
 };
 
-module.exports = { templateModel };
+
+// const templateModel = (db) => {
+//   const Template = db.define(
+//     "Template",
+//     {
+//       template_id: {
+//         type: DataTypes.STRING,
+//         allowNull: false,
+//         primaryKey: true,
+//       },
+//       title: {
+//         type: DataTypes.STRING,
+//         allowNull: false,
+//       },
+//       style: {
+//         type: DataTypes.STRING,
+//       },
+//       orientation: {
+//         type: DataTypes.STRING,
+//       },
+//       theme_color: {
+//         type: DataTypes.STRING,
+//       },
+//       alignment: {
+//         type: DataTypes.STRING,
+//       },
+//       blanko_url: {
+//         type: DataTypes.STRING,
+//         validate: { isUrl: { msg: "Please Provide a valid Url" } },
+//       },
+//       created_by: {
+//         type: DataTypes.STRING,
+//       },
+//       elements_data: {
+//         type: DataTypes.TEXT, // Using TEXT for potentially large JSON data
+//       },
+//     },
+//   );
+
+//   return Template;
+// };
+
+// module.exports = { templateModel };

@@ -123,15 +123,43 @@ const { DataTypes } = require("sequelize");
  *           description: The role of the user within the organization.
  */
 
+'use strict';
+const { Model } = require('sequelize');
 
+// Change the export to this function format
+module.exports = (sequelize, DataTypes) => {
+  // Define the model class
+  class User extends Model {
+    /**
+     * This static method will be called by models/index.js to create the associations.
+     */
+    static associate(models) {
+      // --- Place all associations involving User here ---
 
-const userModel = (db) => {
-  const User = db.define("User", {
+      // For MyWall/BO (many-to-many with Role via UserRole)
+      User.belongsToMany(models.Role, { through: models.UserRole, foreignKey: 'user_id' });
+
+      // For direct access to the junction table
+      User.hasMany(models.UserRole, { foreignKey: 'user_id' });
+      
+      // For MyCertifico (one-to-many with the junction table)
+      User.hasMany(models.UserOrganizationRole, { foreignKey: 'user_id' });
+      
+      // For Certificate Recipients
+      User.hasMany(models.Recipient, { foreignKey: 'user_id', as: 'issued_certificates' });
+      
+      // For Certificate Batches (as a creator)
+      User.hasMany(models.Batch, { foreignKey: 'creator_id', as: 'created_batches' });
+    }
+  }
+
+  // Initialize the model with its fields (columns)
+  User.init({
     user_id: {
       type: DataTypes.UUID,
-      allowNull: false,
-      primaryKey: true,
       defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
     },
     full_name: {
       type: DataTypes.STRING,
@@ -146,7 +174,7 @@ const userModel = (db) => {
         this.setDataValue("email", value.toLowerCase().trim());
       },
     },
-    password: {
+    password: { // Your schema calls this password_hash, ensure this matches the database column name
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -164,9 +192,57 @@ const userModel = (db) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+  }, {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users' // Explicitly set the table name to match your schema
   });
 
   return User;
 };
 
-module.exports = { userModel };
+// const userModel = (db) => {
+//   const User = db.define("User", {
+//     user_id: {
+//       type: DataTypes.UUID,
+//       allowNull: false,
+//       primaryKey: true,
+//       defaultValue: DataTypes.UUIDV4,
+//     },
+//     full_name: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//     },
+//     email: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//       unique: true,
+//       validate: { isEmail: { msg: "Please Provide a valid Email" } },
+//       set(value) {
+//         this.setDataValue("email", value.toLowerCase().trim());
+//       },
+//     },
+//     password: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//     },
+//     photo_url: {
+//       type: DataTypes.STRING,
+//       validate: { isUrl: { msg: "Please Provide a valid Url" } },
+//     },
+//     verify_token: {
+//       type: DataTypes.STRING,
+//     },
+//     verify_token_expires_at: {
+//       type: DataTypes.DATE,
+//     },
+//     is_active: {
+//       type: DataTypes.BOOLEAN,
+//       defaultValue: false,
+//     },
+//   });
+
+//   return User;
+// };
+
+// module.exports = { userModel };

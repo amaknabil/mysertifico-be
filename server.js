@@ -1,10 +1,11 @@
 const express = require("express");
 const { PORT } = require("./config/env.config");
-const { db } = require("./config/db.config");
+const db = require('./models');
 const router = require("./routes");
 const cookieParser = require("cookie-parser");
 const CustomError = require("./utils/customError");
 const globalErrorHandler = require("./controllers/error.controller");
+const logger = require("./config/logger");
 
 const app = express();
 
@@ -25,15 +26,30 @@ app.all("/*splat", (req, res, next) => {
 //global error handler
 app.use(globalErrorHandler);
 
-app.listen(PORT, async () => {
-  console.log("Runnig on", PORT);
+// --- New Start Function ---
+const startServer = async () => {
   try {
-    await db.sync({
-      // force:true
-      // alter:true
+    // 1. Authenticate the database connection
+    await db.sequelize.authenticate();
+    logger.info("✅ Database connection has been established successfully.");
+
+    // 2. Sync models (optional, good for development)
+    await db.sequelize.sync({
+      // force: true, // Use with caution: drops tables
+      // alter: true,  // Use with caution: alters tables
     });
-    console.log("DB connected successfully");
-  } catch {
-    console.error("Failed to connect to DB");
+    logger.info("All models were synchronized successfully.");
+
+    // 3. Start the Express server ONLY after the database is ready
+    app.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}`);
+    });
+
+  } catch (error) {
+    logger.error("❌ Unable to start the server:", error);
+    process.exit(1); // Exit if the database connection fails
   }
-});
+};
+
+// --- Call the function to start everything ---
+startServer();

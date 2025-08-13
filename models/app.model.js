@@ -1,26 +1,63 @@
-const { DataTypes } = require("sequelize");
+"use strict";
+const { Model } = require("sequelize");
 
-const appModel = (db) => {
-  const App = db.define("App", {
-    app_id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      unique: true,
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
+module.exports = (sequelize, DataTypes) => {
+  class App extends Model {
+    static associate(models) {
+      App.hasMany(models.Role, { foreignKey: "app_id" });
+    }
+  }
+
+  App.init(
+    {
+      app_id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        unique: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      app_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      app_code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
-    app_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique:true
-    },
-    app_code: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
+    {
+      sequelize,
+      modelName: "App",
+      tableName: "apps",
+    }
+  );
 
   return App;
 };
 
-module.exports = { appModel };
+// const appModel = (db) => {
+//   const App = db.define("App", {
+//     app_id: {
+//       type: DataTypes.UUID,
+//       primaryKey: true,
+//       unique: true,
+//       defaultValue: DataTypes.UUIDV4,
+//       allowNull: false,
+//     },
+//     app_name: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//       unique:true
+//     },
+//     app_code: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//     },
+//   });
+
+//   return App;
+// };
+
+// module.exports = { appModel };
