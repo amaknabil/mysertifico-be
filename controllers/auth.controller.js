@@ -8,9 +8,11 @@ const {
 const { User } = require("../models");
 const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
-const { JWT_SECRET } = require("../config/env.config");
+// [CHANGE] Added BASE_URL to the require statement
+const { JWT_SECRET, BASE_URL } = require("../config/env.config");
 const Email = require("../utils/sendResetPasswordEmail");
 const CustomError = require("../utils/customError");
+const crypto = require("crypto");
 const {
   handleMyWallSignup,
   handleBoSignup,
@@ -107,47 +109,57 @@ const logoutHandeler = asyncHandler(async (req, res) => {
 const forgotPasswordHandler = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-  const oldUser = await User.findOne({ where: { email: email } });
-
-  if (!oldUser) {
-    throw new CustomError("This user's email does not exist", 400);
+  const user = await User.findOne({ where: { email: email } });
+  // [CHANGE] Check for user existence
+  if (!user) {
+    throw new CustomError("There is no user with that email address.", 404);
   }
-  const secret = JWT_SECRET + oldUser.password;
-  const token = jwt.sign(
-    { email: oldUser.email, user_id: oldUser.user_id },
-    secret,
-    {
-      expiresIn: "5m",
-    }
-  );
 
-  //change
-  const urlLink = `http://localhost:3000/api/auth/reset-password/${oldUser.user_id}/${token}`;
+  // [CHANGE] Generate a new reset token and save to the user record
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpiresAt = Date.now() + 3600000; // Token valid for 1 hour
+  await user.save();
 
-  await new Email(oldUser, urlLink).sendPasswordReset();
+  // [CHANGE] Use BASE_URL from env.config.js
+  const urlLink = `${BASE_URL}/api/auth/reset-password/${resetToken}`;
+
+  await new Email(user, urlLink).sendPasswordReset();
 
   res.status(200).json({
-    message: "success",
+    message: "Password reset email sent successfully.",
     urlLink,
   });
 });
 
 const resetPasswordHandler = asyncHandler(async (req, res) => {
-  const { id, token } = req.params;
+  // [CHANGE] Changed from id and token params to just token
+  const { token } = req.params;
   const { password } = req.body;
-  const oldUser = await User.findOne({ where: { id } });
-  if (!oldUser) {
-    throw new CustomError("This user's email does not exist", 400);
+
+  // [CHANGE] Use new resetPasswordToken and resetPasswordExpiresAt fields for lookup
+  const user = await User.findOne({
+    where: {
+      resetPasswordToken: token,
+      resetPasswordExpiresAt: { [Op.gt]: Date.now() },
+    },
+  });
+
+  if (!user) {
+    throw new CustomError("Invalid or expired password reset token.", 400);
   }
-  const secret = JWT_SECRET + oldUser.password;
-  const isVerified = jwt.verify(token, secret);
 
   const salt = await bcryptjs.genSalt(10);
   const hashedPassword = await bcryptjs.hash(password, salt);
-  await User.update({ password: hashedPassword }, { where: { id } });
 
+  // [CHANGE] Update user password and clear reset token fields
+  user.password = hashedPassword;
+  user.resetPasswordToken = null;
+  user.resetPasswordExpiresAt = null;
+  await user.save();
+  
   res.status(200).json({
-    message: "Pasword Updated",
+    message: "Password has been reset successfully.",
   });
 });
 
@@ -164,16 +176,18 @@ const changePasswordHandler = asyncHandler(async (req, res) => {
       message: "New passwords do not match",
     });
   }
+  
+  // [CHANGE] Fetch the current user before checking the password
+  const currentUser = await User.findOne({ where: { user_id } });
 
-  const samePassword = await bcrypt.compare(newPassword, currentUser.password);
+  // [CHANGE] Moved password comparison after fetching the user
+  const samePassword = await bcryptjs.compare(newPassword, currentUser.password);
   if (samePassword) {
     throw new CustomError(
       "New password cannot be same as current password",
       400
     );
   }
-
-  const currentUser = await User.findOne({ where: { user_id } });
 
   const isMatch = await bcryptjs.compare(currentPassword, currentUser.password);
   if (!isMatch) {

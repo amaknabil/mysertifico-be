@@ -1,3 +1,4 @@
+// [CHANGE] Corrected import to directly use the Logo model
 const { Logo } = require("../models");
 const CustomError = require("../utils/customError");
 const { Op } = require("sequelize");
@@ -31,6 +32,7 @@ exports.getAllLogos = async (req, res, next) => {
       }
     }
 
+    // [CHANGE] Using the imported Logo model directly
     const logos = await Logo.findAll({
       where: searchConditions,
       limit: limit,
@@ -56,6 +58,7 @@ exports.getAllLogos = async (req, res, next) => {
 // Create a new logo
 exports.createLogo = async (req, res, next) => {
   try {
+    // [CHANGE] Using the imported Logo model directly
     const newLogo = await Logo.create(req.body);
 
     res.status(201).json({
@@ -77,6 +80,7 @@ exports.createLogo = async (req, res, next) => {
 exports.getLogoById = async (req, res, next) => {
   try {
     const { id } = req.params;
+    // [CHANGE] Using the imported Logo model directly
     const logo = await Logo.findByPk(id);
 
     if (!logo) {
@@ -101,6 +105,7 @@ exports.getLogoById = async (req, res, next) => {
 exports.updateLogo = async (req, res, next) => {
   try {
     const { id } = req.params;
+    // [CHANGE] Using the imported Logo model directly
     const [updatedRowsCount] = await Logo.update(req.body, {
       where: { logo_id: id },
     });
@@ -111,6 +116,7 @@ exports.updateLogo = async (req, res, next) => {
       );
     }
 
+    // [CHANGE] Using the imported Logo model directly
     const updatedLogo = await Logo.findByPk(id);
 
     res.status(200).json({
@@ -132,6 +138,7 @@ exports.updateLogo = async (req, res, next) => {
 exports.deleteLogo = async (req, res, next) => {
   try {
     const { id } = req.params;
+    // [CHANGE] Using the imported Logo model directly
     const deletedRowCount = await Logo.destroy({
       where: { logo_id: id },
     });

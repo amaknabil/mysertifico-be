@@ -1,3 +1,4 @@
+// [CHANGE] Corrected import to directly use the Template model
 const { Template } = require("../models");
 const CustomError = require("../utils/customError");
 const { Op } = require("sequelize");
@@ -34,8 +35,8 @@ exports.getAllTemplates = async (req, res) => {
       }
     }
 
-    // Execute the database query with the search and pagination conditions
-    const templates = await db.Template.findAll({
+    // [CHANGE] Using the imported Template model directly
+    const templates = await Template.findAll({
       where: searchConditions,
       limit: limit,
       offset: offset,
@@ -60,6 +61,7 @@ exports.getAllTemplates = async (req, res) => {
 exports.countAllTemplates = async (req, res) => {
   try {
     // Call the count method on the Template model to get the total number of records.
+    // [CHANGE] Using the imported Template model directly
     const totalCount = await Template.count();
 
     res.status(200).json({
@@ -79,6 +81,7 @@ exports.countAllTemplates = async (req, res) => {
 //Controller function to create a new template
 exports.createTemplate = async (req, res, next) => {
   try {
+    // [CHANGE] Using the imported Template model directly
     const newTemplate = await Template.create(req.body);
 
     res.status(201).json({
@@ -100,6 +103,7 @@ exports.createTemplate = async (req, res, next) => {
 exports.getTemplateById = async (req, res, next) => {
   try {
     const { id } = req.params;
+    // [CHANGE] Using the imported Template model directly
     const template = await Template.findByPk(id);
 
     if (!template) {
@@ -124,6 +128,7 @@ exports.getTemplateById = async (req, res, next) => {
 exports.updateTemplate = async (req, res, next) => {
   try {
     const { id } = req.params;
+    // [CHANGE] Using the imported Template model directly
     const [updatedRowsCount] = await Template.update(req.body, {
       where: { template_id: id },
     });
@@ -136,6 +141,7 @@ exports.updateTemplate = async (req, res, next) => {
 
     // Since MySQL doesn't have the 'returning' option,
     // we need to fetch the updated record to send it in the response.
+    // [CHANGE] Using the imported Template model directly
     const updatedTemplate = await Template.findByPk(id);
 
     res.status(200).json({
@@ -157,6 +163,7 @@ exports.updateTemplate = async (req, res, next) => {
 exports.deleteTemplate = async (req, res, next) => {
   try {
     const { id } = req.params;
+    // [CHANGE] Using the imported Template model directly
     const deletedRowCount = await Template.destroy({
       where: { template_id: id },
     });

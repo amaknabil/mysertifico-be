@@ -91,13 +91,7 @@ const { DataTypes } = require("sequelize");
  *           type: string
  *           format: password
  *           example: "password123"
- * 
- */
-
-/**
- * @openapi
- * components:
- *   schemas:
+ *
  *     UpdateUserProfileDto:
  *       type: object
  *       properties:
@@ -141,13 +135,13 @@ module.exports = (sequelize, DataTypes) => {
 
       // For direct access to the junction table
       User.hasMany(models.UserRole, { foreignKey: 'user_id' });
-      
+
       // For MyCertifico (one-to-many with the junction table)
       User.hasMany(models.UserOrganizationRole, { foreignKey: 'user_id' });
-      
+
       // For Certificate Recipients
       User.hasMany(models.Recipient, { foreignKey: 'user_id', as: 'issued_certificates' });
-      
+
       // For Certificate Batches (as a creator)
       User.hasMany(models.Batch, { foreignKey: 'creator_id', as: 'created_batches' });
     }
@@ -192,6 +186,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    // [CHANGE] Added fields for password reset tokens
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+    },
+    resetPasswordExpiresAt: {
+      type: DataTypes.DATE,
+    },
   }, {
     sequelize,
     modelName: 'User',
@@ -200,49 +201,3 @@ module.exports = (sequelize, DataTypes) => {
 
   return User;
 };
-
-// const userModel = (db) => {
-//   const User = db.define("User", {
-//     user_id: {
-//       type: DataTypes.UUID,
-//       allowNull: false,
-//       primaryKey: true,
-//       defaultValue: DataTypes.UUIDV4,
-//     },
-//     full_name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     email: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//       unique: true,
-//       validate: { isEmail: { msg: "Please Provide a valid Email" } },
-//       set(value) {
-//         this.setDataValue("email", value.toLowerCase().trim());
-//       },
-//     },
-//     password: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     photo_url: {
-//       type: DataTypes.STRING,
-//       validate: { isUrl: { msg: "Please Provide a valid Url" } },
-//     },
-//     verify_token: {
-//       type: DataTypes.STRING,
-//     },
-//     verify_token_expires_at: {
-//       type: DataTypes.DATE,
-//     },
-//     is_active: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: false,
-//     },
-//   });
-
-//   return User;
-// };
-
-// module.exports = { userModel };

@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const { SMTP_HOST, SMTP_USER, SMTP_PASSWORD } = require("../config/env.config");
+const { SMTP_HOST, SMTP_USER, SMTP_PASSWORD, BASE_URL } = require("../config/env.config");
 const ejs = require("ejs");
 const fs = require("fs");
 const path = require("path");
@@ -24,9 +24,10 @@ module.exports = async (to, name, url) => {
     path.join(__dirname, "..", "templates", "verifyEmail.ejs"),
     "utf-8"
   );
+  // [CHANGE] Uses the BASE_URL from the environment configuration
   const html = ejs.render(template, {
     name: name,
-    link: url,
+    link: `${BASE_URL}${url}`,
     email :to
   });
 
