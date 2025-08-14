@@ -13,23 +13,59 @@ module.exports = {
       [
         {
           role_id: ROLE_SERTIFICO_SUPER_ADMIN_ID,
-          role_name: "Sertifico Super Admin",
+
+          role_name: "Super Admin",
+          app_id: MYSERTIFICO_APP_ID,
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt:new Date()
         },
         {
-          role_id: ROLE_MYWALL_PARENT_ID,
-          role_name: "Mywall Parent",
+          role_id: ROLE_SERTIFICO_ADMIN_ID,
+          role_name: "Admin",
+          app_id: MYSERTIFICO_APP_ID,
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt:new Date()
+        },
+        {
+          role_id: ROLE_SERTIFICO_CREATOR_ID,
+          role_name: "Creator",
+          app_id: MYSERTIFICO_APP_ID,
+          createdAt: new Date(),
+          updatedAt:new Date()
+        },
+        {
+          role_id: ROLE_SERTIFICO_VERIFIER_ID,
+          role_name: "Verifier",
+          app_id: MYSERTIFICO_APP_ID,
+          createdAt: new Date(),
+          updatedAt:new Date()
+        },
+        {
+          role_id: ROLE_SERTIFICO_SIGNATORY_ID,
+          role_name: "Signatory",
+          app_id: MYSERTIFICO_APP_ID,
+          createdAt: new Date(),
+          updatedAt:new Date()
+        },
+    
+
+        // MyWall Roles
+        {
+          role_id: ROLE_MYWALL_PARENT_ID,
+          role_name: "Parent",
+          app_id: MYWALL_APP_ID,
+          createdAt: new Date(),
+          updatedAt:new Date()
         },
         {
           role_id: ROLE_MYWALL_STUDENT_ID,
-          role_name: "Mywall Student",
+          role_name: "Student",
+          app_id: MYWALL_APP_ID,
           createdAt: new Date(),
-          updatedAt: new Date(),
+          updatedAt:new Date()
         },
         {
+
           role_id: ROLE_BO_ADMIN_ID,
           role_name: "BO Admin",
           createdAt: new Date(),
@@ -41,6 +77,7 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+
       ],
       {}
     );
