@@ -23,6 +23,7 @@ module.exports = {
         full_name: 'Mr Sertifico',
         is_active:true,
         createdAt: new Date(),
+        updatedAt:new Date()
       },
       {
         user_id: USER_MYWALL_PARENT_ID,
@@ -31,6 +32,7 @@ module.exports = {
         full_name: 'Fatimah',
         is_active:true,
         createdAt: new Date(),
+        updatedAt:new Date()
       },
       {
         user_id: USER_MYWALL_STUDENT_ID,
@@ -39,6 +41,7 @@ module.exports = {
         full_name: 'Boon',
         is_active:true,
         createdAt: new Date(),
+        updatedAt:new Date()
       },
        {
         user_id: USER_BO_ADMIN_ID,
@@ -47,6 +50,7 @@ module.exports = {
         full_name: 'Chandra',
         is_active:true,
         createdAt: new Date(),
+        updatedAt:new Date()
       },
       {
         user_id: USER_BO_SUPER_ADMIN_ID,
@@ -55,6 +59,7 @@ module.exports = {
         full_name: 'Chandra',
         is_active:true,
         createdAt: new Date(),
+        updatedAt:new Date()
       },
       ],
       {}

@@ -13,6 +13,7 @@ module.exports = {
           organization_name: "MySertifico Academy",
           is_active:true,
           createdAt: new Date(),
+          updatedAt:new Date()
         },
       ],
       {}
