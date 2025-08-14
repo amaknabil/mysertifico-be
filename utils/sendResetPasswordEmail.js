@@ -1,13 +1,15 @@
 const nodemailer = require("nodemailer");
 const ejs = require("ejs");
 const fs = require("fs");
-const path = require("path"); 
-const { SMTP_HOST, SMTP_USER, SMTP_PASSWORD } = require("../config/env.config");
+const path = require("path");
+// [CHANGE] Added BASE_URL to the require statement
+const { SMTP_HOST, SMTP_USER, SMTP_PASSWORD, BASE_URL } = require("../config/env.config");
 
 module.exports = class Email {
   constructor(user, urlLink) {
     this.to = user.email;
     this.name = user.full_name;
+    // [CHANGE] The urlLink is now just the path, so BASE_URL is prepended here
     this.urlLink = urlLink;
     this.from = `MySertifico Admin <mysertifico.admin@gmail.com>`;
   }
@@ -30,9 +32,10 @@ module.exports = class Email {
         path.join(__dirname,'..','templates','resetPassword.ejs'),
         "utf-8"
       );
+      // [CHANGE] Prepended BASE_URL to the urlLink for dynamic links
       const html = ejs.render(template, {
         name: this.name,
-        link: this.urlLink,
+        link: `${BASE_URL}${this.urlLink}`,
         email:this.to
       });
 
@@ -54,7 +57,7 @@ module.exports = class Email {
     } catch (err) {
         console.error(err)
     }
-    
+
   }
 
   async sendPasswordReset() {

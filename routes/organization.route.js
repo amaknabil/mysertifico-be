@@ -3,11 +3,11 @@ const {authMiddleware,protectAndCheckRoleMiddleware} = require('../middleware/au
 const { inviteUserHandler, verifyUserOrganization, getAllOrganization, updateOrganizationStatus } = require('../controllers/organization.controller');
 const router = express.Router();
 
-
 // router.route('/:organization_id/invite').post(authMiddleware,protectAndCheckRoleMiddleware('Super Admin'),inviteUserHandler);
 // router.route('/verify').get(verifyUserOrganization);
 // router.route('/').get(getAllOrganization);
 // router.route('/:organization_id/status').patch(updateOrganizationStatus);
+
 /**
  * @openapi
  * tags:
@@ -19,7 +19,8 @@ const router = express.Router();
  * @openapi
  * /api/organizations/{organization_id}/invite:
  *   post:
- *     tags: [Organizations]
+ *     tags:
+ *       - Organizations
  *     summary: Invite a new member to an organization
  *     description: Allows a Super Admin to invite a new user to their organization. If the user is new to the platform, a new account is created with a temporary password.
  *     security:
@@ -48,15 +49,17 @@ const router = express.Router();
  *       '409':
  *         description: Conflict - The user is already a member of this organization.
  */
-router
-  .route('/:organization_id/invite')
+
+router.route('/:organization_id/invite')
+  // [CHANGE] ensured correct role array is passed to middleware
   .post(authMiddleware, protectAndCheckRoleMiddleware(['Super Admin', 'Admin']), inviteUserHandler);
 
 /**
  * @openapi
  * /api/organizations/verify:
  *   get:
- *     tags: [Organizations]
+ *     tags:
+ *       - Organizations
  *     summary: Verify a new user's account
  *     description: Verifies a user's email via a token sent during the invitation process.
  *     parameters:
@@ -72,13 +75,15 @@ router
  *       '400':
  *         description: Invalid or expired token.
  */
+
 router.route('/verify').get(verifyUserOrganization);
 
 /**
  * @openapi
  * /api/organizations:
  *   get:
- *     tags: [Organizations]
+ *     tags:
+ *       - Organizations
  *     summary: Get a paginated list of organizations
  *     description: Retrieves a list of all organizations, with optional search and pagination.
  *     security:
@@ -117,13 +122,15 @@ router.route('/verify').get(verifyUserOrganization);
  *                       items:
  *                         $ref: '#/components/schemas/OrganizationResponse'
  */
+
 router.route('/').get(authMiddleware, getAllOrganization);
 
 /**
  * @openapi
  * /api/organizations/{organization_id}/status:
  *   patch:
- *     tags: [Organizations]
+ *     tags:
+ *       - Organizations
  *     summary: Toggle the active status of an organization
  *     description: Activates or deactivates an organization.
  *     security:
@@ -146,7 +153,8 @@ router.route('/').get(authMiddleware, getAllOrganization);
  *       '404':
  *         description: Organization not found.
  */
+
 router.route('/:organization_id/status').patch(authMiddleware, updateOrganizationStatus);
 
 
-module.exports = router 
+module.exports = router
