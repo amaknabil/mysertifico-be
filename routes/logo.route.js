@@ -40,7 +40,6 @@ const logosController = require('../controllers/logo.controller');
  *       '500':
  *         description: Internal server error.
  */
-
 router.get('/', logosController.getAllLogos);
 
 /**
@@ -67,36 +66,36 @@ router.get('/', logosController.getAllLogos);
  *       '500':
  *         description: Internal server error.
  */
-
 router.post('/', logosController.createLogo);
 
 /**
  * @openapi
- * /logos/{id}:
+ * /logos/search:
  *   get:
- *     summary: Get a single logo by its ID
+ *     summary: Search logos by name
  *     tags: [Logos]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - in: query
+ *         name: name
  *         schema:
  *           type: string
  *         required: true
- *         description: The unique ID of the logo.
+ *         description: The name of the logo to search for.
  *     responses:
  *       '200':
- *         description: Success, returns a single logo.
+ *         description: Success, returns matching logos.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Logo'
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Logo'
  *       '404':
- *         description: Logo not found.
+ *         description: No logos found with that name.
  *       '500':
  *         description: Internal server error.
  */
-
-router.get('/:id', logosController.getLogoById);
+router.get('/search', logosController.getLogoByName);
 
 /**
  * @openapi
@@ -129,7 +128,6 @@ router.get('/:id', logosController.getLogoById);
  *       '500':
  *         description: Internal server error.
  */
-
 router.patch('/:id', logosController.updateLogo);
 
 /**
@@ -154,6 +152,5 @@ router.patch('/:id', logosController.updateLogo);
  *         description: Internal server error.
  */
 router.delete('/:id', logosController.deleteLogo);
-
 
 module.exports = router;
