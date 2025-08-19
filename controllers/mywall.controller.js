@@ -25,13 +25,16 @@ const getMyWallUsersHandler = asyncHandler(async (req, res) => {
   const { count, rows: userRoles } = await UserRole.findAndCountAll({
     limit: limit,
     offset: offset,
+    // CHANGE 1: Specify which attributes to get from the UserRole table
+    attributes: ["is_active"], 
     include: [
       {
         model: User,
-        where: userWhereClause, // Apply search filters here
+        where: userWhereClause,
         required: true,
         attributes: {
-          exclude: ["password", "verify_token", "verify_token_expires_at"],
+          // CHANGE 2: Exclude is_active from the User model to avoid naming conflicts
+          exclude: ["password", "verify_token", "verify_token_expires_at", "is_active"],
         },
       },
       {
@@ -41,7 +44,7 @@ const getMyWallUsersHandler = asyncHandler(async (req, res) => {
         include: [
           {
             model: App,
-            where: { app_name: "MyWall" }, // Filter by App name here
+            where: { app_name: "MyWall" },
             required: true,
             attributes: [],
           },
@@ -51,14 +54,13 @@ const getMyWallUsersHandler = asyncHandler(async (req, res) => {
   });
 
   // --- 4. Transform the data to get a clean list of users ---
-  // The result is an array of UserRole objects, so we extract the User from each.
   const users = userRoles.map((userRole) => {
-    // 1. Convert the Sequelize User instance to a plain JavaScript object
     const userObject = userRole.User.get({ plain: true });
-
-    // 2. Add the role_name from the nested Role object to the user object
+    
     userObject.role_name = userRole.Role.role_name;
     userObject.role_id = userRole.Role.role_id;
+    // CHANGE 3: Add the is_active status from the UserRole record to the final object
+    userObject.is_active = userRole.is_active;
 
     return userObject;
   });
@@ -75,7 +77,7 @@ const getMyWallUsersHandler = asyncHandler(async (req, res) => {
       totalUsers: count,
       totalPages: Math.ceil(count / limit),
       currentPage: page,
-      users: users, // Send the transformed user list
+      users: users,
     },
   });
 });

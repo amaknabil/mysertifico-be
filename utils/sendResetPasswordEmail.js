@@ -3,14 +3,14 @@ const ejs = require("ejs");
 const fs = require("fs");
 const path = require("path");
 // [CHANGE] Added BASE_URL to the require statement
-const { SMTP_HOST, SMTP_USER, SMTP_PASSWORD, BASE_URL } = require("../config/env.config");
+const { SMTP_HOST, SMTP_USER, SMTP_PASSWORD, LOGIN_URL } = require("../config/env.config");
 
 module.exports = class Email {
-  constructor(user, urlLink) {
+  constructor(user) {
     this.to = user.email;
     this.name = user.full_name;
     // [CHANGE] The urlLink is now just the path, so BASE_URL is prepended here
-    this.urlLink = urlLink;
+    // this.urlLink = urlLink;
     this.from = `MySertifico Admin <mysertifico.admin@gmail.com>`;
   }
 
@@ -26,7 +26,7 @@ module.exports = class Email {
     });
   }
 
-  async send(subject) {
+  async send(subject ,temporaryPassword) {
     try {
       const template = fs.readFileSync(
         path.join(__dirname,'..','templates','resetPassword.ejs'),
@@ -34,9 +34,10 @@ module.exports = class Email {
       );
       // [CHANGE] Prepended BASE_URL to the urlLink for dynamic links
       const html = ejs.render(template, {
-        name: this.name,
-        link: `${BASE_URL}${this.urlLink}`,
-        email:this.to
+        full_name: this.name,
+        // link: `${BASE_URL}${this.urlLink}`,
+        temporaryPassword:temporaryPassword,
+        loginUrl: LOGIN_URL
       });
 
       const mailOptions = {
@@ -60,7 +61,7 @@ module.exports = class Email {
 
   }
 
-  async sendPasswordReset() {
-    await this.send("Your Reset Password");
+  async sendPasswordReset(temporaryPassword) {
+    await this.send("Your Reset Password",temporaryPassword);
   }
 };
