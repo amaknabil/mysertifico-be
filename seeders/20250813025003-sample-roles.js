@@ -1,5 +1,11 @@
 "use strict";
 
+// Define App UUIDs to link roles to their applications
+const MYSERTIFICO_APP_ID = "4a0b1c2d-3e4f-5a6b-7c8d-9e0f1a2b3c4d";
+const MYWALL_APP_ID = "5b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e";
+const BO_APP_ID = "6c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f";
+
+// Define Role UUIDs
 const ROLE_SERTIFICO_SUPER_ADMIN_ID = '5f2c7a3d-4e9b-6c1f-a2b3-d4e5f6a7b8c9';
 const ROLE_MYWALL_PARENT_ID = '6a3d8b4e-5f0c-7d2d-b3c4-e5f6a7b8c9d0';
 const ROLE_MYWALL_STUDENT_ID = '7b4e9c5f-6a1d-8e3e-c4d5-f6a7b8c9d0e1';
@@ -13,71 +19,39 @@ module.exports = {
       [
         {
           role_id: ROLE_SERTIFICO_SUPER_ADMIN_ID,
-
-          role_name: "Super Admin",
-          app_id: MYSERTIFICO_APP_ID,
+          role_name: "Sertifico Super Admin",
+          app_id: MYSERTIFICO_APP_ID, // Add this foreign key
           createdAt: new Date(),
-          updatedAt:new Date()
+          updatedAt: new Date(),
         },
-        {
-          role_id: ROLE_SERTIFICO_ADMIN_ID,
-          role_name: "Admin",
-          app_id: MYSERTIFICO_APP_ID,
-          createdAt: new Date(),
-          updatedAt:new Date()
-        },
-        {
-          role_id: ROLE_SERTIFICO_CREATOR_ID,
-          role_name: "Creator",
-          app_id: MYSERTIFICO_APP_ID,
-          createdAt: new Date(),
-          updatedAt:new Date()
-        },
-        {
-          role_id: ROLE_SERTIFICO_VERIFIER_ID,
-          role_name: "Verifier",
-          app_id: MYSERTIFICO_APP_ID,
-          createdAt: new Date(),
-          updatedAt:new Date()
-        },
-        {
-          role_id: ROLE_SERTIFICO_SIGNATORY_ID,
-          role_name: "Signatory",
-          app_id: MYSERTIFICO_APP_ID,
-          createdAt: new Date(),
-          updatedAt:new Date()
-        },
-    
-
-        // MyWall Roles
         {
           role_id: ROLE_MYWALL_PARENT_ID,
-          role_name: "Parent",
-          app_id: MYWALL_APP_ID,
+          role_name: "Mywall Parent",
+          app_id: MYWALL_APP_ID, // Add this foreign key
           createdAt: new Date(),
-          updatedAt:new Date()
+          updatedAt: new Date(),
         },
         {
           role_id: ROLE_MYWALL_STUDENT_ID,
-          role_name: "Student",
-          app_id: MYWALL_APP_ID,
+          role_name: "Mywall Student",
+          app_id: MYWALL_APP_ID, // Add this foreign key
           createdAt: new Date(),
-          updatedAt:new Date()
+          updatedAt: new Date(),
         },
         {
-
           role_id: ROLE_BO_ADMIN_ID,
           role_name: "BO Admin",
+          app_id: BO_APP_ID, // Add this foreign key
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
           role_id: ROLE_BO_SUPER_ADMIN_ID,
           role_name: "BO Super Admin",
+          app_id: BO_APP_ID, // Add this foreign key
           createdAt: new Date(),
           updatedAt: new Date(),
         },
-
       ],
       {}
     );

@@ -27,7 +27,12 @@ class Email {
 
   async _send(template, subject, templateData) {
     // 1. Read and render the EJS template
-    const templatePath = path.join(__dirname, "..", "templates", `${template}.ejs`);
+    const templatePath = path.join(
+      __dirname,
+      "..",
+      "templates",
+      `${template}.ejs`
+    );
     const html = await ejs.renderFile(templatePath, {
       name: this.name,
       ...templateData, // Pass additional data to the template
@@ -39,11 +44,13 @@ class Email {
       to: this.to,
       subject,
       html,
-      attachments: [{
-        filename: "logo.png",
-        path: path.join(__dirname, "..", "public", "images", "logo.png"),
-        cid: "logoImage", 
-      }],
+      attachments: [
+        {
+          filename: "logo.png",
+          path: path.join(__dirname, "..", "public", "images", "logo.png"),
+          cid: "logoImage",
+        },
+      ],
     };
 
     // 3. Send the email
@@ -57,7 +64,7 @@ class Email {
     await this._send("newUserInvite", subject, {
       organizationName,
       temporaryPassword,
-      loginUrl
+      loginUrl,
     });
   }
 
@@ -65,7 +72,27 @@ class Email {
     const subject = `You've been added to ${organizationName}`;
     await this._send("existingUserNotice", subject, {
       organizationName,
-      roleName
+      roleName,
+    });
+  }
+
+  //BO invite email
+  async newUserInviteBO({ temporaryPassword, loginUrl, roleName,full_name }) {
+    const subject = `You're invited to join Back Office on MySertifico! as ${roleName}`;
+    await this._send("BOnewUserInvite", subject, {
+      temporaryPassword,
+      loginUrl,
+      roleName,
+      full_name
+    });
+  }
+
+  async existingUserNoticeBO({ loginUrl, roleName, full_name }) {
+    const subject = "You've been added to Back Office";
+    await this._send("BOexistingUserNotice", subject, {
+      roleName,
+      loginUrl,
+      full_name
     });
   }
 }

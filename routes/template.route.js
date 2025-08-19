@@ -29,23 +29,36 @@ const templateController = require('../controllers/template.controller');
  *           minimum: 1
  *         description: The number of items to return per page.
  *       - in: query
- *         name: search
+ *         name: name
  *         schema:
  *           type: string
- *         description: A search query to filter templates by title.
+ *         description: Filter templates by title (partial match).
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *         description: Filter templates by template ID (exact match).
  *     responses:
  *       '200':
- *         description: Success, returns an array of templates.
+ *         description: Success, returns an array of templates with pagination.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Template'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Template'
  *       '500':
  *         description: Internal server error.
  */
-
 router.get('/', templateController.getAllTemplates);
 
 /**
@@ -62,12 +75,13 @@ router.get('/', templateController.getAllTemplates);
  *             schema:
  *               type: object
  *               properties:
- *                 count:
+ *                 success:
+ *                   type: boolean
+ *                 total:
  *                   type: integer
  *       '500':
  *         description: Internal server error.
  */
-
 router.get('/count', templateController.countAllTemplates);
 
 /**
@@ -94,7 +108,6 @@ router.get('/count', templateController.countAllTemplates);
  *       '500':
  *         description: Internal server error.
  */
-
 router.post('/', templateController.createTemplate);
 
 /**
@@ -122,7 +135,6 @@ router.post('/', templateController.createTemplate);
  *       '500':
  *         description: Internal server error.
  */
-
 router.get('/:id', templateController.getTemplateById);
 
 /**
@@ -156,7 +168,6 @@ router.get('/:id', templateController.getTemplateById);
  *       '500':
  *         description: Internal server error.
  */
-
 router.patch('/:id', templateController.updateTemplate);
 
 /**
@@ -181,6 +192,5 @@ router.patch('/:id', templateController.updateTemplate);
  *         description: Internal server error.
  */
 router.delete('/:id', templateController.deleteTemplate);
-
 
 module.exports = router;
