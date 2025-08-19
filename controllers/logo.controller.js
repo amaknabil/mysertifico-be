@@ -3,38 +3,14 @@ const { Logo } = require("../models");
 const CustomError = require("../utils/customError");
 const { Op } = require("sequelize");
 
-// Get all logos with pagination and search
+// ✅ Get all logos with pagination (no search here)
 exports.getAllLogos = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 12;
     const offset = (page - 1) * limit;
 
-    // Build a dynamic search condition object
-    const searchConditions = {};
-    const { name, id } = req.query;
-
-    if (name || id) {
-      searchConditions[Op.or] = [];
-
-      // Add a search condition for the 'name' query parameter
-      if (name) {
-        searchConditions[Op.or].push({
-          file_name: { [Op.like]: `%${name}%` },
-        });
-      }
-
-      // Add a search condition for the 'id' query parameter
-      if (id) {
-        searchConditions[Op.or].push({
-          logo_id: id,
-        });
-      }
-    }
-
-    // [CHANGE] Using the imported Logo model directly
     const logos = await Logo.findAll({
-      where: searchConditions,
       limit: limit,
       offset: offset,
     });
@@ -55,10 +31,9 @@ exports.getAllLogos = async (req, res, next) => {
   }
 };
 
-// Create a new logo
+// ✅ Create a new logo
 exports.createLogo = async (req, res, next) => {
   try {
-    // [CHANGE] Using the imported Logo model directly
     const newLogo = await Logo.create(req.body);
 
     res.status(201).json({
@@ -76,11 +51,43 @@ exports.createLogo = async (req, res, next) => {
   }
 };
 
-// Get a single logo by ID
+// ✅ Search logos by name only
+exports.getLogoByName = async (req, res, next) => {
+  try {
+    const { name } = req.query;
+
+    if (!name) {
+      return next(new CustomError("Query parameter 'name' is required", 400));
+    }
+
+    const logos = await Logo.findAll({
+      where: {
+        file_name: { [Op.like]: `%${name}%` },
+      },
+    });
+
+    if (!logos || logos.length === 0) {
+      return next(new CustomError(`No logos found with name: ${name}`, 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      data: logos,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to search logos by name.",
+      error: error.message,
+    });
+  }
+};
+
+// ✅ Get a single logo by ID
 exports.getLogoById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // [CHANGE] Using the imported Logo model directly
     const logo = await Logo.findByPk(id);
 
     if (!logo) {
@@ -101,11 +108,11 @@ exports.getLogoById = async (req, res, next) => {
   }
 };
 
-// Update an existing logo
+// ✅ Update an existing logo
 exports.updateLogo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // [CHANGE] Using the imported Logo model directly
+
     const [updatedRowsCount] = await Logo.update(req.body, {
       where: { logo_id: id },
     });
@@ -116,7 +123,6 @@ exports.updateLogo = async (req, res, next) => {
       );
     }
 
-    // [CHANGE] Using the imported Logo model directly
     const updatedLogo = await Logo.findByPk(id);
 
     res.status(200).json({
@@ -134,11 +140,10 @@ exports.updateLogo = async (req, res, next) => {
   }
 };
 
-// Delete a logo
+// ✅ Delete a logo
 exports.deleteLogo = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // [CHANGE] Using the imported Logo model directly
     const deletedRowCount = await Logo.destroy({
       where: { logo_id: id },
     });
