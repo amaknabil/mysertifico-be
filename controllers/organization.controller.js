@@ -15,7 +15,6 @@ const { Op } = require("sequelize");
 const inviteUserHandler = asyncHandler(async (req, res) => {
   const { full_name, email, role_name } = req.body;
   const { organization_id } = req.params;
-  const inviter = req.user;
 
   if (!full_name || !email || !role_name) {
     throw new CustomError("Please provide all detail to assign member", 400);
