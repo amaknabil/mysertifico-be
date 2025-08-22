@@ -12,8 +12,11 @@ const boRouter = require('./bo.route');
 const certificateRouter = require('./certificate.route');
 const templateRouter = require('./template.route');
 const logoRouter = require('./logo.route');
+const myprofileRouter = require('./myprofile.route'); 
 const swaggerUi = require('swagger-ui-express');
-const {  swaggerSpecification } = require('../config/swagger.config');
+const supportRouter = require('./support.route');
+const replyRouter = require('./reply.route'); 
+const { swaggerSpecification } = require('../config/swagger.config');
 
 
 router.use('/auth', authRouter);
@@ -27,13 +30,13 @@ router.use('/bo',boRouter);
 router.use('/certificates',certificateRouter);
 router.use('/templates', templateRouter);
 router.use('/logos', logoRouter);
+router.use('/support', supportRouter); 
+router.use('/myprofile', myprofileRouter); 
+router.use('/api/support', replyRouter);
 router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecification));
 
-
-
-
-//Documentation routes
-router.use('/docs',swaggerUi.serve);
-router.use('/docs',swaggerUi.setup(swaggerSpecification))
+// Note: The two lines below for Swagger are redundant and can be simplified as one line above
+// router.use('/docs',swaggerUi.serve);
+// router.use('/docs',swaggerUi.setup(swaggerSpecification))
 
 module.exports = router
