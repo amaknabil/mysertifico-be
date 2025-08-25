@@ -26,6 +26,14 @@ const { Model } = require("sequelize");
  *           type: string
  *           description: The message content.
  *           example: "I have a question about your services."
+ *         status:
+ *           type: string
+ *           description: The status of the contact submission (e.g., unread, read).
+ *           example: "unread"
+ *         subject:
+ *           type: string
+ *           description: The subject of the contact submission.
+ *           example: "Problem with QR Code"
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -37,6 +45,7 @@ const { Model } = require("sequelize");
  *         - fullname
  *         - email
  *         - message
+ *         - subject
  *       properties:
  *         fullname:
  *           type: string
@@ -48,61 +57,79 @@ const { Model } = require("sequelize");
  *         message:
  *           type: string
  *           example: "This is a test message."
+ *         subject:
+ *           type: string
+ *           example: "General Inquiry"
+ *         status:
+ *           type: string
+ *           description: Optional status for the submission. Default is 'unread'.
+ *           example: "unread"
  */
 
 module.exports = (sequelize, DataTypes) => {
   class Contact_Us extends Model {}
 
-  Contact_Us.init({
-    id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      primaryKey: true,
-      defaultValue: DataTypes.UUIDV4,
+  Contact_Us.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+      },
+      fullname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      message: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "unread",
+      },
+      subject: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
-    fullname: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    message: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-  },{
-    sequelize,
-    tableName:'contact_us',
-    modelName:'Contact_Us'
-  });
-  return Contact_Us
+    {
+      sequelize,
+      tableName: "contact_us",
+      modelName: "Contact_Us",
+    }
+  );
+
+  return Contact_Us;
 };
 
-
+// Alternative definition
 // const contactUsModel = (db) => {
-//     return db.define('Contact_Us',{
-//         id:{
-//             type:DataTypes.UUID,
-//             allowNull:false,
-//             primaryKey:true,
-//             defaultValue:DataTypes.UUIDV4
-
-//         },
-//         fullname:{
-//             type: DataTypes.STRING,
-//             allowNull:false
-//         },
-//         email:{
-//             type:DataTypes.STRING,
-//             allowNull:false
-//         },
-//         message:{
-//             type: DataTypes.TEXT,
-//             allowNull:false
-//         }
-
-//     })
-// }
-// module.exports = { contactUsModel }
+//   return db.define("Contact_Us", {
+//     id: {
+//       type: DataTypes.UUID,
+//       allowNull: false,
+//       primaryKey: true,
+//       defaultValue: DataTypes.UUIDV4,
+//     },
+//     fullname: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//     },
+//     email: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//     },
+//     message: {
+//       type: DataTypes.TEXT,
+//       allowNull: false,
+//     },
+//   });
+// };
+// module.exports = { contactUsModel };
