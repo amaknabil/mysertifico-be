@@ -12,7 +12,7 @@ const boRouter = require('./bo.route');
 const certificateRouter = require('./certificate.route');
 const templateRouter = require('./template.route');
 const logoRouter = require('./logo.route');
-const myprofileRouter = require('./myprofile.route');
+const myprofileRouter = require('./myprofile.route'); // Conflict resolved
 const planRouter = require('./plan.route');
 const swaggerUi = require('swagger-ui-express');
 const supportRouter = require('./support.route');
@@ -34,7 +34,7 @@ router.use('/logos', logoRouter);
 router.use('/support', supportRouter);
 router.use('/myprofile', myprofileRouter);
 router.use('/api/support', replyRouter);
-router.use('/plans', planRouter);
+router.use('/plans', planRouter); // Only one instance remains
 router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecification));
 
 

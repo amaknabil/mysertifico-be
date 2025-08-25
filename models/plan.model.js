@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DECIMAL(10, 2), // Use DECIMAL for financial values
         allowNull: false,
       },
+      price_pertoken: {
+        type: DataTypes.DECIMAL(10, 2), // Use DECIMAL for financial values
+        allowNull: false,
+      },
       subscription: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -51,11 +55,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM('active', 'inactive', 'archived'), // Use ENUM for clearer statuses
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: 'active',
+        defaultValue: true,
       },
-      country: {
+      country_code: {
         type: DataTypes.STRING,
         allowNull: false,
       },
