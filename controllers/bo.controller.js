@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { User, Role, UserRole, App, sequelize } = require("../models");
+const { User, Role, UserRole, App, sequelize ,Recipient, Template, Organization,Invoice } = require("../models");
 const CustomError = require("../utils/customError");
 const bcryptjs = require("bcryptjs");
 const crypto = require("crypto");
@@ -310,10 +310,69 @@ const updateBOUserStatusHandler = asyncHandler(async (req, res) => {
   });
 });
 
+
+const getBODashboardSummary = asyncHandler(async (req, res) => {
+  // --- 1. Define Date Range for "This Month" ---
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+  // --- 2. Fetch App IDs for Sales Calculation ---
+  const mySertificoApp = await App.findOne({ where: { app_name: 'MySertifico' } });
+  const myWallApp = await App.findOne({ where: { app_name: 'MyWall' } });
+
+  // --- 3. Run All Summary Queries in Parallel ---
+  const [
+    certificatesIssued,
+    readyTemplates,
+    registeredOrganizations,
+    activeUsers,
+    mySertificoSales,
+    myWallSales,
+  ] = await Promise.all([
+    Recipient.count(),
+    Template.count(),
+    Organization.count(),
+    User.count({ where: { is_active: true } }),
+    Invoice.sum('price', {
+      where: {
+        app_id: mySertificoApp ? mySertificoApp.app_id : null,
+        createdAt: { [Op.between]: [startDate, endDate] },
+      },
+    }),
+    Invoice.sum('price', {
+      where: {
+        app_id: myWallApp ? myWallApp.app_id : null,
+        createdAt: { [Op.between]: [startDate, endDate] },
+      },
+    }),
+  ]);
+
+  // --- 4. Format the Response ---
+  const summary = {
+    statistics: {
+      certificatesIssued: certificatesIssued || 0,
+      readyTemplates: readyTemplates || 0,
+      registeredOrganizations: registeredOrganizations || 0,
+      activeUsers: activeUsers || 0,
+    },
+    salesSummary: {
+      mySertificoSubscriptions: mySertificoSales || 0,
+      myWallSubscriptions: myWallSales || 0,
+    },
+  };
+
+  res.status(200).json({
+    status: "success",
+    data: summary,
+  });
+});
+
 module.exports = {
   updateBOHandler,
   addBoUserHandler,
   getAllBOUsersHandler,
   searchBOUsersHandler,
   updateBOUserStatusHandler,
+  getBODashboardSummary
 };
