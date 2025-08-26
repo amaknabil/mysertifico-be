@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
   class App extends Model {
     static associate(models) {
       App.hasMany(models.Role, { foreignKey: "app_id" });
+      // An app can have many plans
+      App.hasMany(models.Plan, { foreignKey: "app_id" });
+
+      // An app can be associated with many invoices
+      App.hasMany(models.Invoice, { foreignKey: "app_id" });
     }
   }
 

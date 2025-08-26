@@ -1,12 +1,13 @@
 const express = require('express');
 const {authMiddleware,protectAndCheckRoleMiddleware} = require('../middleware/auth.middleware');
-const { inviteUserHandler, verifyUserOrganization, getAllOrganization, updateOrganizationStatus } = require('../controllers/organization.controller');
+const { inviteUserHandler, verifyUserOrganization, getAllOrganization, updateOrganizationStatus, getAllOrganizationUsersHandler, updateOrganizationUserStatusHandler } = require('../controllers/organization.controller');
 const router = express.Router();
 
 
 // router.route('/:organization_id/invite').post(authMiddleware,protectAndCheckRoleMiddleware('Super Admin'),inviteUserHandler);
 // router.route('/verify').get(verifyUserOrganization);
-// router.route('/').get(getAllOrganization);
+router.route('/org-users').get(getAllOrganizationUsersHandler);
+router.route('/:organization_id/user/:user_id/status').patch(updateOrganizationUserStatusHandler);
 // router.route('/:organization_id/status').patch(updateOrganizationStatus);
 /**
  * @openapi
@@ -52,27 +53,6 @@ router
   .route('/:organization_id/invite')
   .post(authMiddleware, protectAndCheckRoleMiddleware(['Super Admin', 'Admin']), inviteUserHandler);
 
-/**
- * @openapi
- * /api/organizations/verify:
- *   get:
- *     tags: [Organizations]
- *     summary: Verify a new user's account
- *     description: Verifies a user's email via a token sent during the invitation process.
- *     parameters:
- *       - in: query
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: The verification token from the invitation email.
- *     responses:
- *       '200':
- *         description: Account verified and activated successfully.
- *       '400':
- *         description: Invalid or expired token.
- */
-router.route('/verify').get(verifyUserOrganization);
 
 /**
  * @openapi

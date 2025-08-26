@@ -115,20 +115,18 @@ const forgotPasswordHandler = asyncHandler(async (req, res) => {
     throw new CustomError("There is no user with that email address.", 404);
   }
 
-  // [CHANGE] Generate a new reset token and save to the user record
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  user.resetPasswordToken = resetToken;
-  user.resetPasswordExpiresAt = Date.now() + 3600000; // Token valid for 1 hour
+  const temporaryPassword = crypto.randomBytes(6).toString("base64url");
+  const salt = await bcryptjs.genSalt(10);
+  const hashedPassword = await bcryptjs.hash(temporaryPassword, salt);
+
+  user.password = hashedPassword;
   await user.save();
 
-  // [CHANGE] Use BASE_URL from env.config.js
-  const urlLink = `${BASE_URL}/api/auth/reset-password/${resetToken}`;
-
-  await new Email(user, urlLink).sendPasswordReset();
+  await new Email(user).sendPasswordReset(temporaryPassword);
 
   res.status(200).json({
     message: "Password reset email sent successfully.",
-    urlLink,
+    temporaryPassword
   });
 });
 
@@ -157,7 +155,7 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
   user.resetPasswordToken = null;
   user.resetPasswordExpiresAt = null;
   await user.save();
-  
+
   res.status(200).json({
     message: "Password has been reset successfully.",
   });
@@ -176,12 +174,15 @@ const changePasswordHandler = asyncHandler(async (req, res) => {
       message: "New passwords do not match",
     });
   }
-  
+
   // [CHANGE] Fetch the current user before checking the password
   const currentUser = await User.findOne({ where: { user_id } });
 
   // [CHANGE] Moved password comparison after fetching the user
-  const samePassword = await bcryptjs.compare(newPassword, currentUser.password);
+  const samePassword = await bcryptjs.compare(
+    newPassword,
+    currentUser.password
+  );
   if (samePassword) {
     throw new CustomError(
       "New password cannot be same as current password",

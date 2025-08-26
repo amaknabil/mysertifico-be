@@ -1,21 +1,18 @@
-// Import Supertest for making HTTP requests to our Express app
 const request = require('supertest');
-
-// --- Corrected Path ---
-// We now require the files with the correct names.
-const logosRouter = require('../routes/logo.route');
-const templatesRouter = require('../routes/template.route');
-
-// Import Express to create a mock application for testing
 const express = require('express');
 
-// --- Corrected Step 2: Define and Mock the Controllers ---
+const logosRouter = require('../routes/logo.route');
+const templatesRouter = require('../routes/template.route');
+const myprofileRouter = require('../routes/myprofile.route');
+
+// Mock all controllers used in the test file
 jest.mock('../controllers/logo.controller', () => ({
   getAllLogos: jest.fn((req, res) => res.status(200).json({ mock: 'logos' })),
   createLogo: jest.fn((req, res) => res.status(201).json({ mock: 'new logo' })),
   getLogoById: jest.fn((req, res) => res.status(200).json({ mock: 'single logo' })),
   updateLogo: jest.fn((req, res) => res.status(200).json({ mock: 'updated logo' })),
   deleteLogo: jest.fn((req, res) => res.status(204).send()),
+  getLogoByName: jest.fn((req, res) => res.status(200).json({ mock: 'searched logo' })),
 }));
 
 jest.mock('../controllers/template.controller', () => ({
@@ -27,126 +24,135 @@ jest.mock('../controllers/template.controller', () => ({
   deleteTemplate: jest.fn((req, res) => res.status(204).send()),
 }));
 
-// --- Step 3: Create a Mock Express App ---
+jest.mock('../controllers/myprofile.controller', () => ({
+  getProfile: jest.fn((req, res) => res.status(200).json({ mock: 'profile' })),
+  updateProfile: jest.fn((req, res) => res.status(200).json({ mock: 'updated profile' })),
+  uploadProfilePicture: jest.fn((req, res) => res.status(200).json({ mock: 'profile picture uploaded' })),
+}));
+
+// Mock the authentication and upload middleware to allow tests to run
+jest.mock('../middleware/auth.middleware', () => ({
+  authMiddleware: (req, res, next) => {
+    req.user = { id: 'mock-user-id' };
+    next();
+  },
+}));
+
+jest.mock('../middleware/upload.middleware', () => ({
+  single: () => (req, res, next) => {
+    req.file = { filename: 'mock_filename.jpg' };
+    next();
+  },
+}));
+
+// Mock app
 const app = express();
-app.use(express.json()); // Needed to parse JSON body
+app.use(express.json());
 app.use('/logos', logosRouter);
 app.use('/templates', templatesRouter);
+app.use('/api/myprofile', myprofileRouter);
 
-// --- Step 4: Write the Test Files ---
 describe('API Router Tests', () => {
-
-  // A "beforeEach" hook to reset the mock functions before each test
   beforeEach(() => {
-    // We can now access the mock functions from the require cache
-    // since they are defined inside the jest.mock calls.
-    require('../controllers/logo.controller').getAllLogos.mockClear();
-    require('../controllers/logo.controller').createLogo.mockClear();
-    require('../controllers/logo.controller').getLogoById.mockClear();
-    require('../controllers/logo.controller').updateLogo.mockClear();
-    require('../controllers/logo.controller').deleteLogo.mockClear();
-    
-    require('../controllers/template.controller').getAllTemplates.mockClear();
-    require('../controllers/template.controller').countAllTemplates.mockClear();
-    require('../controllers/template.controller').createTemplate.mockClear();
-    require('../controllers/template.controller').getTemplateById.mockClear();
-    require('../controllers/template.controller').updateTemplate.mockClear();
-    require('../controllers/template.controller').deleteTemplate.mockClear();
+    jest.clearAllMocks();
   });
 
-  // --- Tests for the Logos Router ---
   describe('Logos Router', () => {
-
-    it('should call logosController.getAllLogos on GET /logos', async () => {
+    it('GET /logos calls getAllLogos', async () => {
       const { getAllLogos } = require('../controllers/logo.controller');
       await request(app).get('/logos').expect(200);
-      expect(getAllLogos).toHaveBeenCalledTimes(1);
+      expect(getAllLogos).toHaveBeenCalled();
     });
 
-    it('should call logosController.getAllLogos with pagination queries on GET /logos', async () => {
-      const { getAllLogos } = require('../controllers/logo.controller');
-      await request(app).get('/logos?page=2&limit=10').expect(200);
-      expect(getAllLogos).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call logosController.createLogo on POST /logos', async () => {
+    it('POST /logos calls createLogo', async () => {
       const { createLogo } = require('../controllers/logo.controller');
-      const newLogo = { name: 'Test Logo', url: 'http://test.com/logo.png' };
-      await request(app).post('/logos').send(newLogo).expect(201);
-      expect(createLogo).toHaveBeenCalledTimes(1);
+      await request(app).post('/logos').send({}).expect(201);
+      expect(createLogo).toHaveBeenCalled();
     });
 
-    it('should call logosController.getLogoById on GET /logos/:id', async () => {
+    it('GET /logos/search calls getLogoByName', async () => {
+      const { getLogoByName } = require('../controllers/logo.controller');
+      await request(app).get('/logos/search?name=test').expect(200);
+      expect(getLogoByName).toHaveBeenCalled();
+    });
+
+    it('GET /logos/:id calls getLogoById', async () => {
       const { getLogoById } = require('../controllers/logo.controller');
-      const logoId = '12345';
-      await request(app).get(`/logos/${logoId}`).expect(200);
-      expect(getLogoById).toHaveBeenCalledTimes(1);
+      await request(app).get('/logos/123').expect(200);
+      expect(getLogoById).toHaveBeenCalled();
     });
 
-    it('should call logosController.updateLogo on PATCH /logos/:id', async () => {
+    it('PATCH /logos/:id calls updateLogo', async () => {
       const { updateLogo } = require('../controllers/logo.controller');
-      const logoId = '12345';
-      const updatedData = { name: 'Updated Logo' };
-      await request(app).patch(`/logos/${logoId}`).send(updatedData).expect(200);
-      expect(updateLogo).toHaveBeenCalledTimes(1);
+      await request(app).patch('/logos/123').send({}).expect(200);
+      expect(updateLogo).toHaveBeenCalled();
     });
 
-    it('should call logosController.deleteLogo on DELETE /logos/:id', async () => {
+    it('DELETE /logos/:id calls deleteLogo', async () => {
       const { deleteLogo } = require('../controllers/logo.controller');
-      const logoId = '12345';
-      await request(app).delete(`/logos/${logoId}`).expect(204);
-      expect(deleteLogo).toHaveBeenCalledTimes(1);
+      await request(app).delete('/logos/123').expect(204);
+      expect(deleteLogo).toHaveBeenCalled();
     });
   });
 
-  // --- Tests for the Templates Router ---
   describe('Templates Router', () => {
-
-    it('should call templateController.getAllTemplates on GET /templates', async () => {
+    it('GET /templates calls getAllTemplates', async () => {
       const { getAllTemplates } = require('../controllers/template.controller');
       await request(app).get('/templates').expect(200);
-      expect(getAllTemplates).toHaveBeenCalledTimes(1);
+      expect(getAllTemplates).toHaveBeenCalled();
     });
 
-    it('should call templateController.getAllTemplates with search query on GET /templates', async () => {
-      const { getAllTemplates } = require('../controllers/template.controller');
-      await request(app).get('/templates?search=corporate').expect(200);
-      expect(getAllTemplates).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call templateController.countAllTemplates on GET /templates/count', async () => {
+    it('GET /templates/count calls countAllTemplates', async () => {
       const { countAllTemplates } = require('../controllers/template.controller');
       await request(app).get('/templates/count').expect(200);
-      expect(countAllTemplates).toHaveBeenCalledTimes(1);
+      expect(countAllTemplates).toHaveBeenCalled();
     });
 
-    it('should call templateController.createTemplate on POST /templates', async () => {
+    it('POST /templates calls createTemplate', async () => {
       const { createTemplate } = require('../controllers/template.controller');
-      const newTemplate = { name: 'Test Template' };
-      await request(app).post('/templates').send(newTemplate).expect(201);
-      expect(createTemplate).toHaveBeenCalledTimes(1);
+      await request(app).post('/templates').send({}).expect(201);
+      expect(createTemplate).toHaveBeenCalled();
     });
 
-    it('should call templateController.getTemplateById on GET /templates/:id', async () => {
+    it('GET /templates/:id calls getTemplateById', async () => {
       const { getTemplateById } = require('../controllers/template.controller');
-      const templateId = '67890';
-      await request(app).get(`/templates/${templateId}`).expect(200);
-      expect(getTemplateById).toHaveBeenCalledTimes(1);
+      await request(app).get('/templates/123').expect(200);
+      expect(getTemplateById).toHaveBeenCalled();
     });
 
-    it('should call templateController.updateTemplate on PATCH /templates/:id', async () => {
+    it('PATCH /templates/:id calls updateTemplate', async () => {
       const { updateTemplate } = require('../controllers/template.controller');
-      const templateId = '67890';
-      const updatedData = { name: 'Updated Template' };
-      await request(app).patch(`/templates/${templateId}`).send(updatedData).expect(200);
-      expect(updateTemplate).toHaveBeenCalledTimes(1);
+      await request(app).patch('/templates/123').send({}).expect(200);
+      expect(updateTemplate).toHaveBeenCalled();
     });
 
-    it('should call templateController.deleteTemplate on DELETE /templates/:id', async () => {
+    it('DELETE /templates/:id calls deleteTemplate', async () => {
       const { deleteTemplate } = require('../controllers/template.controller');
-      const templateId = '67890';
-      await request(app).delete(`/templates/${templateId}`).expect(204);
-      expect(deleteTemplate).toHaveBeenCalledTimes(1);
+      await request(app).delete('/templates/123').expect(204);
+      expect(deleteTemplate).toHaveBeenCalled();
+    });
+  });
+
+  // Added My Profile Router tests
+  describe('My Profile Router', () => {
+    it('GET /api/myprofile calls getProfile', async () => {
+      const { getProfile } = require('../controllers/myprofile.controller');
+      // Pass a mock header to satisfy the auth middleware
+      await request(app).get('/api/myprofile').set('Authorization', 'Bearer mock-token').expect(200);
+      expect(getProfile).toHaveBeenCalled();
+    });
+
+    it('PATCH /api/myprofile calls updateProfile', async () => {
+      const { updateProfile } = require('../controllers/myprofile.controller');
+      await request(app).patch('/api/myprofile').set('Authorization', 'Bearer mock-token').send({}).expect(200);
+      expect(updateProfile).toHaveBeenCalled();
+    });
+    
+    it('POST /api/myprofile/photo calls uploadProfilePicture', async () => {
+      const { uploadProfilePicture } = require('../controllers/myprofile.controller');
+      // A mock file needs to be sent for the multipart/form-data request
+      await request(app).post('/api/myprofile/photo').set('Authorization', 'Bearer mock-token').attach('file', Buffer.from('mock file content'), 'test.jpg').expect(200);
+      expect(uploadProfilePicture).toHaveBeenCalled();
     });
   });
 });

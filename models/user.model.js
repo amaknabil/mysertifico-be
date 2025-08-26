@@ -91,7 +91,7 @@ const { DataTypes } = require("sequelize");
  *           type: string
  *           format: password
  *           example: "password123"
- * 
+ *
  */
 
 /**
@@ -123,8 +123,8 @@ const { DataTypes } = require("sequelize");
  *           description: The role of the user within the organization.
  */
 
-'use strict';
-const { Model } = require('sequelize');
+("use strict");
+const { Model } = require("sequelize");
 
 // Change the export to this function format
 module.exports = (sequelize, DataTypes) => {
@@ -137,66 +137,86 @@ module.exports = (sequelize, DataTypes) => {
       // --- Place all associations involving User here ---
 
       // For MyWall/BO (many-to-many with Role via UserRole)
-      User.belongsToMany(models.Role, { through: models.UserRole, foreignKey: 'user_id' });
+      User.belongsToMany(models.Role, {
+        through: models.UserRole,
+        foreignKey: "user_id",
+      });
 
       // For direct access to the junction table
-      User.hasMany(models.UserRole, { foreignKey: 'user_id' });
-      
+      User.hasMany(models.UserRole, { foreignKey: "user_id" });
+
       // For MyCertifico (one-to-many with the junction table)
-      User.hasMany(models.UserOrganizationRole, { foreignKey: 'user_id' });
-      
+      User.hasMany(models.UserOrganizationRole, { foreignKey: "user_id" });
+
       // For Certificate Recipients
-      User.hasMany(models.Recipient, { foreignKey: 'user_id', as: 'issued_certificates' });
-      
+      User.hasMany(models.Recipient, {
+        foreignKey: "user_id",
+        as: "issued_certificates",
+      });
+
       // For Certificate Batches (as a creator)
-      User.hasMany(models.Batch, { foreignKey: 'creator_id', as: 'created_batches' });
+      User.hasMany(models.Batch, {
+        foreignKey: "creator_id",
+        as: "created_batches",
+      });
+
+      // Associations for Plans and Invoices
+      User.hasMany(models.UserPlan, { foreignKey: "user_id" });
+      User.hasMany(models.Invoice, { foreignKey: "user_id" });
+
+      // A user can have many token usage records
+      User.hasMany(models.TokenUsage, { foreignKey: "user_id" });
     }
   }
 
   // Initialize the model with its fields (columns)
-  User.init({
-    user_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-      allowNull: false,
-    },
-    full_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: { isEmail: { msg: "Please Provide a valid Email" } },
-      set(value) {
-        this.setDataValue("email", value.toLowerCase().trim());
+  User.init(
+    {
+      user_id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+        allowNull: false,
+      },
+      full_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: { isEmail: { msg: "Please Provide a valid Email" } },
+        set(value) {
+          this.setDataValue("email", value.toLowerCase().trim());
+        },
+      },
+      password: {
+        // Your schema calls this password_hash, ensure this matches the database column name
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      photo_url: {
+        type: DataTypes.STRING,
+        validate: { isUrl: { msg: "Please Provide a valid Url" } },
+      },
+      verify_token: {
+        type: DataTypes.STRING,
+      },
+      verify_token_expires_at: {
+        type: DataTypes.DATE,
+      },
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
-    password: { // Your schema calls this password_hash, ensure this matches the database column name
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    photo_url: {
-      type: DataTypes.STRING,
-      validate: { isUrl: { msg: "Please Provide a valid Url" } },
-    },
-    verify_token: {
-      type: DataTypes.STRING,
-    },
-    verify_token_expires_at: {
-      type: DataTypes.DATE,
-    },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-  }, {
-    sequelize,
-    modelName: 'User',
-    tableName: 'users' // Explicitly set the table name to match your schema
-  });
+    {
+      sequelize,
+      modelName: "User",
+      tableName: "users", // Explicitly set the table name to match your schema
+    }
+  );
 
   return User;
 };

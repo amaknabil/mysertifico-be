@@ -5,8 +5,8 @@ const logosController = require('../controllers/logo.controller');
 /**
  * @openapi
  * tags:
- *   name: Logos
- *   description: API for managing logos
+ *   - name: Logos
+ *     description: API for managing logos
  */
 
 /**
@@ -96,6 +96,33 @@ router.post('/', logosController.createLogo);
  *         description: Internal server error.
  */
 router.get('/search', logosController.getLogoByName);
+
+/**
+ * @openapi
+ * /logos/{id}:
+ *   get:
+ *     summary: Get a logo by ID
+ *     tags: [Logos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The unique ID of the logo.
+ *     responses:
+ *       '200':
+ *         description: Success, returns the logo.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Logo'
+ *       '404':
+ *         description: Logo not found.
+ *       '500':
+ *         description: Internal server error.
+ */
+router.get('/:id', logosController.getLogoById);
 
 /**
  * @openapi

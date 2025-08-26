@@ -35,7 +35,7 @@ const startServer = async () => {
 
     // 2. Sync models (optional, good for development)
     await db.sequelize.sync({
-      // force: true, // Use with caution: drops tables
+      // force: true, // Use with caution: drops tables   
       // alter: true,  // Use with caution: alters tables
     });
     logger.info("All models were synchronized successfully.");

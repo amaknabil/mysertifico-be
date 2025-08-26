@@ -88,6 +88,18 @@ module.exports = (sequelize, DataTypes) => {
 
       //one org can have many certificate_batches
       Batch.belongsTo(models.Organization, { foreignKey: "organization_id" });
+
+      // Association to Template
+      Batch.belongsTo(models.Template, { foreignKey: "template_id" });
+
+      // Each batch creation results in one token usage entry.
+      Batch.hasOne(models.TokenUsage, {
+        foreignKey: "reference_id",
+        constraints: false, // Important: reference_id is a generic field
+        scope: {
+          reason: "Certificate Batch Creation", // Optional: helps in querying
+        },
+      });
     }
   }
 
@@ -101,7 +113,6 @@ module.exports = (sequelize, DataTypes) => {
       template_id: {
         type: DataTypes.UUID,
         allowNull: false,
-        defaultValue: DataTypes.UUIDV4,
       },
       organization_id: {
         type: DataTypes.UUID,
@@ -126,13 +137,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
       createdAt: "issued_at",
       updatedAt: false,
-      modelName:'Batch'
+      modelName: "Batch",
     }
   );
 
   return Batch;
 };
-
 
 // const batchModel = (db) => {
 //     const Batch = db.define('Batch',{
