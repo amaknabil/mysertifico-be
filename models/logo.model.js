@@ -1,36 +1,6 @@
 // const { DataTypes } = require("sequelize");
 'use strict';
 const { Model } = require('sequelize'); 
-/**
- * @openapi
- * components:
- *   schemas:
- *     Logo:
- *       type: object
- *       properties:
- *         logo_id:
- *           type: string
- *           format: uuid
- *           description: The unique identifier for the logo.
- *         file_name:
- *           type: string
- *           description: The name of the logo file.
- *         file_url:
- *           type: string
- *           format: url
- *           description: The URL where the logo file is stored.
- *         file_type:
- *           type: string
- *           description: The file type of the logo (e.g., 'image/png').
- *         is_primary:
- *           type: boolean
- *           description: Indicates if the logo is the primary logo for an organization.
- *       required:
- *         - logo_id
- *         - file_name
- *         - file_url
- *         - is_primary
- */
 
 module.exports = (sequelize, DataTypes) => {
     class Logo extends Model{
