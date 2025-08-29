@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   class Recipient extends Model {
     static associate(models) {
       //one user has many certificate_recipients
-      Recipient.belongsTo(models.User, { foreignKey: "user_id" });
+      Recipient.belongsTo(models.Profile, { foreignKey: "national_id",targetKey: "national_id" });
 
       //one batch has many recipient
       Recipient.belongsTo(models.Batch, { foreignKey: "batch_id" });
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      user_id: {
+      national_id: {
         type: DataTypes.UUID,
         allowNull: false,
       },

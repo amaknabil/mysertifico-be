@@ -15,6 +15,4 @@ router.route('/').post(createCertificateHandler);//kiv need improvement
 
 
 
-
-
 module.exports = router 

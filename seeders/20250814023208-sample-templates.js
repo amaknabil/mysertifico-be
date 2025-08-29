@@ -1,12 +1,15 @@
 "use strict";
 
+const TEMPLATE_ID_1="67d4d7ff-7a89-439f-a189-c3bc408dccb0"
+const TEMPLATE_ID_2="f60552d5-d866-4b92-89cf-27c2d26b42b9"
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.bulkInsert(
       "templates", // The name of the table
       [
         {
-          template_id: "basic_template_1",
+          template_id:TEMPLATE_ID_1,
           template_code: "BASIC_CERT", // New column
           title: "Basic Certificate",
           style: "modern",
@@ -25,7 +28,7 @@ module.exports = {
           updated_date: new Date(), // New column name from model
         },
         {
-          template_id: "advanced_template_2",
+          template_id: TEMPLATE_ID_2,
           template_code: "ADVANCED_DIPLOMA", // New column
           title: "Advanced Diploma",
           style: "classic",
