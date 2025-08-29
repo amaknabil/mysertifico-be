@@ -1,5 +1,6 @@
 "use strict";
 
+// 1st organization
 const ORG_SERTIFICO_ACADEMY_ID = "5c1b8f9e-6a2c-8d3a-e5f6-a7b8c9d0e1f2";
 
 module.exports = {

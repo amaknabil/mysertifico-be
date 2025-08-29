@@ -23,11 +23,6 @@ module.exports = (sequelize, DataTypes) => {
       // For MyCertifico (one-to-many with the junction table)
       User.hasMany(models.UserOrganizationRole, { foreignKey: "user_id" });
 
-      // For Certificate Recipients
-      User.hasMany(models.Recipient, {
-        foreignKey: "user_id",
-        as: "issued_certificates",
-      });
 
       // For Certificate Batches (as a creator)
       User.hasMany(models.Batch, {
@@ -37,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
 
       // Associations for Plans and Invoices
       User.hasMany(models.UserPlan, { foreignKey: "user_id" });
+      User.hasMany(models.Profile, { foreignKey: "user_id" });
       User.hasMany(models.Invoice, { foreignKey: "user_id" });
 
       // A user can have many token usage records
@@ -84,6 +80,9 @@ module.exports = (sequelize, DataTypes) => {
       is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+      },
+      country: {
+        type: DataTypes.STRING,
       },
     },
     {
