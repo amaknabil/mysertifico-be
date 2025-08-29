@@ -1,128 +1,3 @@
-const { DataTypes } = require("sequelize");
-
-/**
- * @openapi
- * components:
- *   schemas:
- *     UserResponse:
- *       type: object
- *       description: The User object as returned by the API, excluding sensitive information.
- *       properties:
- *         user_id:
- *           type: string
- *           format: uuid
- *           description: The unique identifier for the user.
- *           example: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
- *         full_name:
- *           type: string
- *           description: The full name of the user.
- *           example: "Jane Doe"
- *         email:
- *           type: string
- *           format: email
- *           description: The email address of the user.
- *           example: "jane.doe@example.com"
- *         photo_url:
- *           type: string
- *           format: uri
- *           description: URL of the user's profile picture.
- *           example: "https://example.com/path/to/photo.jpg"
- *         is_active:
- *           type: boolean
- *           description: Indicates if the user's account is active.
- *           example: true
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: The date and time the user was created.
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: The date and time the user was last updated.
- *
- *     CreateUserDto:
- *       type: object
- *       description: The required payload for creating a new user through the universal signup endpoint.
- *       required:
- *         - full_name
- *         - email
- *         - password
- *         - app_name
- *       properties:
- *         full_name:
- *           type: string
- *           example: "John Smith"
- *         email:
- *           type: string
- *           format: email
- *           example: "john.smith@example.com"
- *         password:
- *           type: string
- *           format: password
- *           description: User's desired password (min 8 characters).
- *           example: "password123"
- *         app_name:
- *           type: string
- *           description: The source application for the signup.
- *           enum: [mywall, bo, mycertifico]
- *           example: "mywall"
- *         role_name:
- *           type: string
- *           description: Required for 'mywall' signup.
- *           enum: [Parent, Student]
- *           example: "Parent"
- *         organization_name:
- *           type: string
- *           description: Required for the first 'mycertifico' signup to create an organization.
- *           example: "My New Company"
- *
- *     LoginDto:
- *       type: object
- *       description: The required payload for user login.
- *       required:
- *         - email
- *         - password
- *       properties:
- *         email:
- *           type: string
- *           format: email
- *           example: "jane.doe@example.com"
- *         password:
- *           type: string
- *           format: password
- *           example: "password123"
- *
- */
-
-/**
- * @openapi
- * components:
- *   schemas:
- *     UpdateUserProfileDto:
- *       type: object
- *       properties:
- *         full_name:
- *           type: string
- *           description: The new full name for the user.
- *           example: "Jane Doe Smith"
- *
- *     UserOrganizationRoleResponse:
- *       type: object
- *       properties:
- *         organizationId:
- *           type: string
- *           format: uuid
- *           description: The unique identifier of the organization.
- *         organizationName:
- *           type: string
- *           example: "Awesome Company Inc."
- *           description: The name of the organization.
- *         userRole:
- *           type: string
- *           example: "Admin"
- *           description: The role of the user within the organization.
- */
-
 ("use strict");
 const { Model } = require("sequelize");
 
@@ -148,11 +23,6 @@ module.exports = (sequelize, DataTypes) => {
       // For MyCertifico (one-to-many with the junction table)
       User.hasMany(models.UserOrganizationRole, { foreignKey: "user_id" });
 
-      // For Certificate Recipients
-      User.hasMany(models.Recipient, {
-        foreignKey: "user_id",
-        as: "issued_certificates",
-      });
 
       // For Certificate Batches (as a creator)
       User.hasMany(models.Batch, {
@@ -162,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
 
       // Associations for Plans and Invoices
       User.hasMany(models.UserPlan, { foreignKey: "user_id" });
+      User.hasMany(models.Profile, { foreignKey: "user_id" });
       User.hasMany(models.Invoice, { foreignKey: "user_id" });
 
       // A user can have many token usage records
@@ -210,6 +81,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      country: {
+        type: DataTypes.STRING,
+      },
     },
     {
       sequelize,
@@ -221,48 +95,3 @@ module.exports = (sequelize, DataTypes) => {
   return User;
 };
 
-// const userModel = (db) => {
-//   const User = db.define("User", {
-//     user_id: {
-//       type: DataTypes.UUID,
-//       allowNull: false,
-//       primaryKey: true,
-//       defaultValue: DataTypes.UUIDV4,
-//     },
-//     full_name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     email: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//       unique: true,
-//       validate: { isEmail: { msg: "Please Provide a valid Email" } },
-//       set(value) {
-//         this.setDataValue("email", value.toLowerCase().trim());
-//       },
-//     },
-//     password: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     photo_url: {
-//       type: DataTypes.STRING,
-//       validate: { isUrl: { msg: "Please Provide a valid Url" } },
-//     },
-//     verify_token: {
-//       type: DataTypes.STRING,
-//     },
-//     verify_token_expires_at: {
-//       type: DataTypes.DATE,
-//     },
-//     is_active: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: false,
-//     },
-//   });
-
-//   return User;
-// };
-
-// module.exports = { userModel };

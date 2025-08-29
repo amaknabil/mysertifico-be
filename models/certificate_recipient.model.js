@@ -2,32 +2,12 @@
 "use strict";
 const { Model } = require("sequelize");
 
-/**
- * @openapi
- * components:
- *   schemas:
- *     RecipientResponse:
- *       type: object
- *       properties:
- *         recipient_id:
- *           type: string
- *           format: uuid
- *         batch_id:
- *           type: string
- *           format: uuid
- *         user_id:
- *           type: string
- *           format: uuid
- *         issued_at:
- *           type: string
- *           format: date-time
- */
 
 module.exports = (sequelize, DataTypes) => {
   class Recipient extends Model {
     static associate(models) {
       //one user has many certificate_recipients
-      Recipient.belongsTo(models.User, { foreignKey: "user_id" });
+      Recipient.belongsTo(models.Profile, { foreignKey: "national_id",targetKey: "national_id" });
 
       //one batch has many recipient
       Recipient.belongsTo(models.Batch, { foreignKey: "batch_id" });
@@ -46,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      user_id: {
+      national_id: {
         type: DataTypes.UUID,
         allowNull: false,
       },

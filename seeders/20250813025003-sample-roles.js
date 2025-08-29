@@ -6,11 +6,22 @@ const MYWALL_APP_ID = "5b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e";
 const BO_APP_ID = "6c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f";
 
 // Define Role UUIDs
+
+//mysertifico
 const ROLE_SERTIFICO_SUPER_ADMIN_ID = '5f2c7a3d-4e9b-6c1f-a2b3-d4e5f6a7b8c9';
+const ROLE_SERTIFICO_CREATOR_ID = '47e8c247-64ad-4044-b976-ee6a445a6258';
+const ROLE_SERTIFICO_VERIFIER_ID = '76b52c86-bc63-4a15-8126-5c5d97d362ce';
+const ROLE_SERTIFICO_SIGNATORY_ID = '425f3a7b-4ffd-4bd4-b6ff-98fc4f02d6e3';
+
+//mywall
 const ROLE_MYWALL_PARENT_ID = '6a3d8b4e-5f0c-7d2d-b3c4-e5f6a7b8c9d0';
 const ROLE_MYWALL_STUDENT_ID = '7b4e9c5f-6a1d-8e3e-c4d5-f6a7b8c9d0e1';
+
+
+//BO
 const ROLE_BO_ADMIN_ID = '8c5f0d6a-7b2e-9f4c-d5e6-a7b8c9d0e1f2';
 const ROLE_BO_SUPER_ADMIN_ID = '9d6f1e7b-8c3f-a05d-e6f7-b8c9d0e1f2g3';
+const ROLE_BO_MANAGER_ID = 'e54cba8d-86db-4877-b6da-5d73bd419039';
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -25,6 +36,29 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          role_id: ROLE_SERTIFICO_CREATOR_ID,
+          role_name: "Creator",
+          app_id: MYSERTIFICO_APP_ID, // Add this foreign key
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          role_id: ROLE_SERTIFICO_VERIFIER_ID,
+          role_name: "Verifier",
+          app_id: MYSERTIFICO_APP_ID, // Add this foreign key
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          role_id: ROLE_SERTIFICO_SIGNATORY_ID,
+          role_name: "Signatory",
+          app_id: MYSERTIFICO_APP_ID, // Add this foreign key
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+
+        //mywall role
+        {
           role_id: ROLE_MYWALL_PARENT_ID,
           role_name: "Mywall Parent",
           app_id: MYWALL_APP_ID, // Add this foreign key
@@ -38,16 +72,26 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+
+        //bo role
         {
           role_id: ROLE_BO_ADMIN_ID,
-          role_name: "BO Admin",
+          role_name: "Admin",
           app_id: BO_APP_ID, // Add this foreign key
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
           role_id: ROLE_BO_SUPER_ADMIN_ID,
-          role_name: "BO Super Admin",
+          role_name: "Super Admin",
+          app_id: BO_APP_ID, // Add this foreign key
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+
+         {
+          role_id: ROLE_BO_MANAGER_ID,
+          role_name: "Manager",
           app_id: BO_APP_ID, // Add this foreign key
           createdAt: new Date(),
           updatedAt: new Date(),
