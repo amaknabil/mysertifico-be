@@ -254,6 +254,7 @@ module.exports = {
         country_code: "MY",
         createdAt: new Date(),
         updatedAt: new Date(),
+        price_pertoken: 0
       },
       {
         plan_id: mywall_my_2,
@@ -266,6 +267,7 @@ module.exports = {
         country_code: "MY",
         createdAt: new Date(),
         updatedAt: new Date(),
+        price_pertoken: 0
       },
       {
         plan_id: mywall_my_3,
@@ -278,6 +280,7 @@ module.exports = {
         country_code: "MY",
         createdAt: new Date(),
         updatedAt: new Date(),
+        price_pertoken: 0
       },
 
       //indonesia
@@ -292,6 +295,7 @@ module.exports = {
         country_code: "IDR",
         createdAt: new Date(),
         updatedAt: new Date(),
+        price_pertoken: 0
       },
       {
         plan_id: mywall_id_2,
@@ -304,6 +308,7 @@ module.exports = {
         country_code: "ID",
         createdAt: new Date(),
         updatedAt: new Date(),
+        price_pertoken: 0
       },
       {
         plan_id: mywall_id_3,
@@ -316,6 +321,7 @@ module.exports = {
         country_code: "ID",
         createdAt: new Date(),
         updatedAt: new Date(),
+        price_pertoken: 0
       },
     ]);
   },
