@@ -1,6 +1,6 @@
 const express = require('express');
 const {authMiddleware,protectAndCheckRoleMiddleware} = require('../middleware/auth.middleware');
-const { inviteUserHandler, verifyUserOrganization, getAllOrganization, updateOrganizationStatus, getAllOrganizationUsersHandler, updateOrganizationUserStatusHandler } = require('../controllers/organization.controller');
+const { inviteUserHandler, verifyUserOrganization, getAllOrganization, updateOrganizationStatus, getAllOrganizationUsersHandler, updateOrganizationUserStatusHandler, getMyOrganizationInfo, updateMyOrganizationInfo, getMyOrganizationPosition, createMyOrganizationPosition } = require('../controllers/organization.controller');
 const router = express.Router();
 
 
@@ -16,8 +16,12 @@ router
 
 router.route('/').get(authMiddleware, getAllOrganization);
 
-
 router.route('/:organization_id/status').patch(authMiddleware, updateOrganizationStatus);
+
+
+//for mysertifico use
+router.route('/:organization_id').get(getMyOrganizationInfo).patch(updateMyOrganizationInfo);
+router.route('/:organization_id/position').get(getMyOrganizationPosition).post(createMyOrganizationPosition);
 
 
 module.exports = router 

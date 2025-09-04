@@ -37,6 +37,8 @@ module.exports = (sequelize, DataTypes) => {
 
       // A user can have many token usage records
       User.hasMany(models.TokenUsage, { foreignKey: "user_id" });
+
+      User.belongsTo(models.Country, { foreignKey: 'country_name' });
     }
   }
 
@@ -81,8 +83,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      country: {
+      country_name: {
         type: DataTypes.STRING,
+        country_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+              model: 'countries',
+              key: 'country_name'
+                  }
+      },
       },
     },
     {

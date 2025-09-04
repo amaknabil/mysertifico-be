@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const CustomError = require("../utils/customError");
 const { db } = require("../config/db.config");
-const { User, UserOrganizationRole, Role, Organization } = require("../models");
+const { User, UserOrganizationRole, Role, Organization,OrganizationPosition } = require("../models");
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
 const Email = require("../utils/sendInviteEmail");
@@ -252,7 +252,6 @@ const updateOrganizationUserStatusHandler = asyncHandler(async (req, res) => {
   // --- 1. Get Identifiers and New Status ---
   const { organization_id, user_id } = req.params;
 
-
   // --- 3. Find the specific user-organization record ---
   // This record uniquely links a user to an organization with a specific role and status.
   const userOrgRole = await UserOrganizationRole.findOne({
@@ -282,10 +281,168 @@ const updateOrganizationUserStatusHandler = asyncHandler(async (req, res) => {
   });
 });
 
+//handler in mysertifico
+
+const getMyOrganizationInfo = asyncHandler(async (req, res) => {
+  const { organization_id } = req.params;
+
+  const organization = await Organization.findOne({ organization_id });
+
+  if (!organization) {
+    throw new CustomError("No Organization with that id exist", 404);
+  }
+
+  res.status(200).json({
+    message: "success",
+    data: organization,
+  });
+});
+
+
+const updateMyOrganizationInfo = asyncHandler(async (req, res) => {
+  const { organization_id } = req.params;
+  const updateData = req.body;
+
+  // Ensure there's something to update
+  if (Object.keys(updateData).length === 0) {
+    throw new CustomError("No update data provided.", 400);
+  }
+
+  // Find the organization by its primary key
+  const organization = await Organization.findByPk(organization_id);
+
+  if (!organization) {
+    throw new CustomError(`Organization with ID ${organization_id} not found.`, 404);
+  }
+
+  // Update the organization with the new data
+  await organization.update(updateData);
+
+  res.status(200).json({
+    status: "success",
+    message: "Organization updated successfully.",
+    data: organization,
+  });
+});
+
+const getMyOrganizationPosition = asyncHandler(async (req, res) => {
+  const { organization_id } = req.params;
+
+  // Find all positions associated with the given organization_id
+  const positions = await OrganizationPosition.findAll({
+    where: { organization_id },
+    order: [['createdAt', 'ASC']], // Optional: order positions by creation time
+  });
+
+  if (!positions.length) {
+    // Check if the organization exists to provide a more specific error message
+    const organizationExists = await Organization.findByPk(organization_id);
+    if (!organizationExists) {
+      throw new CustomError(`Organization with ID ${organization_id} not found.`, 404);
+    }
+  }
+
+  res.status(200).json({
+    status: "success",
+    count: positions.length,
+    data: positions,
+  });
+});
+
+const createMyOrganizationPosition = asyncHandler(async (req, res) => {
+  const { organization_id } = req.params;
+  const { position_name } = req.body;
+
+  // 1. Validate input
+  if (!position_name || position_name.trim() === '') {
+    throw new CustomError("Position name is required.", 400);
+  }
+
+  // 2. Verify that the organization exists
+  const organization = await Organization.findByPk(organization_id);
+  if (!organization) {
+    throw new CustomError(`Organization with ID ${organization_id} not found.`, 404);
+  }
+
+  // 3. Create the new position
+  const newPosition = await OrganizationPosition.create({
+    organization_id,
+    position_name,
+  });
+
+  // 4. Send a 201 Created response
+  res.status(201).json({
+    status: "success",
+    message: "Position created successfully.",
+    data: newPosition,
+  });
+});
+
+const updateMyOrganizationPosition = asyncHandler(async (req, res) => {
+    const { organization_id, organization_position_id } = req.params;
+    const { position_name } = req.body;
+
+    // 1. Validate input
+    if (!position_name || position_name.trim() === '') {
+        throw new CustomError("Position name is required.", 400);
+    }
+
+    // 2. Find the position, ensuring it belongs to the correct organization
+    const position = await OrganizationPosition.findOne({
+        where: {
+            organization_position_id,
+            organization_id,
+        },
+    });
+
+    if (!position) {
+        throw new CustomError(`Position with ID ${organization_position_id} not found in this organization.`, 404);
+    }
+
+    // 3. Update the position name and save
+    position.position_name = position_name;
+    await position.save();
+
+    // 4. Send a 200 OK response
+    res.status(200).json({
+        status: "success",
+        message: "Position updated successfully.",
+        data: position,
+    });
+});
+
+const deleteMyOrganizationPosition = asyncHandler(async (req, res) => {
+    const { organization_id, organization_position_id } = req.params;
+
+    // 1. Find the position to ensure it exists before deleting
+    const position = await OrganizationPosition.findOne({
+        where: {
+            organization_position_id,
+            organization_id,
+        },
+    });
+
+    if (!position) {
+        throw new CustomError(`Position with ID ${organization_position_id} not found in this organization.`, 404);
+    }
+
+    // 2. Delete the position
+    await position.destroy();
+
+    // 3. Send a 204 No Content response
+    res.status(204).send();
+});
+
 module.exports = {
   inviteUserHandler,
   getAllOrganization,
   updateOrganizationStatus,
   getAllOrganizationUsersHandler,
   updateOrganizationUserStatusHandler,
+
+  //for mysertifico
+  getMyOrganizationInfo,
+  updateMyOrganizationInfo,
+  getMyOrganizationPosition,
+  createMyOrganizationPosition
 };
