@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
 
       // An organization can have many token usage records
       Organization.hasMany(models.TokenUsage, { foreignKey: "organization_id" });
+      
+      //org -> postion
+      Organization.hasMany(models.OrganizationPosition, { foreignKey: "organization_id" });
+
+      Organization.belongsTo(models.Country, { foreignKey: 'country_name' });
     }
   }
 
@@ -30,7 +35,41 @@ module.exports = (sequelize, DataTypes) => {
       },
       organization_name: {
         type: DataTypes.STRING,
-        unique: true,
+      },
+      organization_code: {
+        type: DataTypes.STRING,
+      },
+      address_line_1: {
+        type: DataTypes.STRING,
+      },
+      address_line_2: {
+        type: DataTypes.STRING,
+      },
+      postcode: {
+        type: DataTypes.STRING,
+      },
+      city: {
+        type: DataTypes.STRING,
+      },
+      state: {
+        type: DataTypes.STRING,
+      },
+      country_name: {
+        type: DataTypes.STRING,
+        country_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+              model: 'countries',
+              key: 'country_name'
+                  }
+      },
+      },
+      email: {
+        type: DataTypes.STRING,
+      },
+      phone: {
+        type: DataTypes.STRING,
       },
       is_active: {
         type: DataTypes.BOOLEAN,

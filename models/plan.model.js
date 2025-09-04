@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
 
       // A Plan can be associated with many Invoices
       Plan.hasMany(models.Invoice, { foreignKey: "plan_id" });
+
+      Plan.belongsTo(models.Country, { foreignKey: 'country_name' });
     }
   }
 
@@ -59,9 +61,13 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: true,
       },
-      country_code: {
+      country_name: {
         type: DataTypes.STRING,
         allowNull: false,
+        references: {
+              model: 'countries',
+              key: 'country_name'
+                  }
       },
     },
     {
