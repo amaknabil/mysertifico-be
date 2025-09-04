@@ -6,8 +6,14 @@ const cookieParser = require("cookie-parser");
 const CustomError = require("./utils/customError");
 const globalErrorHandler = require("./controllers/error.controller");
 const logger = require("./config/logger");
+const cors = require('cors'); // Add this
 
 const app = express();
+// Add CORS BEFORE your routes (this order matters!)
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(cookieParser());

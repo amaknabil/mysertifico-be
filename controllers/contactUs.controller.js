@@ -1,14 +1,14 @@
 const asyncHandler = require("express-async-handler");
-const { ContactUs } = require("../models");
+const { Contact_Us } = require("../models");
 const CustomError = require("../utils/customError");
 
 const createContactUs = asyncHandler(async (req, res) => {
-  const { fullname, email, message } = req.body;
+  const { name, email, message,subject } = req.body;
 
-  if (!fullname || !email || !message) {
-    throw new CustomError("Please provide Full Name, Email and Message", 400);
+  if (!name || !email || !message) {
+    throw new CustomError("Please provide Full Name, Email and Message dasdasd", 400);
   }
-  const contactUs = await ContactUs.create({ fullname, email, message });
+  const contactUs = await Contact_Us.create({ fullname:name, email, message,subject });
 
   res.status(201).json({
     message: "Contact-Us's Message successfully created",
@@ -17,7 +17,7 @@ const createContactUs = asyncHandler(async (req, res) => {
 });
 
 const getContactUs = asyncHandler(async (req, res) => {
-  const contactUsmessages = await ContactUs.findAll();
+  const contactUsmessages = await Contact_Us.findAll();
   if (!contactUsmessages) {
     throw new CustomError("There is no message yet", 204);
   }

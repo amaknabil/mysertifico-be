@@ -21,7 +21,7 @@ const { swaggerSpecification } = require('../config/swagger.config');
 
 
 router.use('/auth', authRouter);
-router.use('/users',authMiddleware, userRouter);
+router.use('/users', userRouter);
 router.use('/contact-us',contactUsRouter);
 router.use('/apps',appRouter);
 router.use('/roles', roleRouter);
