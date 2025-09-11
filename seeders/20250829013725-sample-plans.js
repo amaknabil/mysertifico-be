@@ -292,7 +292,7 @@ module.exports = {
         subscription: true,
         token_allocation: 25,
         status: true,
-        country_code: "IDR",
+        country_code: "ID",
         createdAt: new Date(),
         updatedAt: new Date(),
         price_pertoken: 0

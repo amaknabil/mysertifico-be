@@ -1,7 +1,13 @@
 const asyncHandler = require("express-async-handler");
 const CustomError = require("../utils/customError");
 const { db } = require("../config/db.config");
-const { User, UserOrganizationRole, Role, Organization,OrganizationPosition } = require("../models");
+const {
+  User,
+  UserOrganizationRole,
+  Role,
+  Organization,
+  OrganizationPosition,
+} = require("../models");
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
 const Email = require("../utils/sendInviteEmail");
@@ -298,7 +304,6 @@ const getMyOrganizationInfo = asyncHandler(async (req, res) => {
   });
 });
 
-
 const updateMyOrganizationInfo = asyncHandler(async (req, res) => {
   const { organization_id } = req.params;
   const updateData = req.body;
@@ -312,7 +317,10 @@ const updateMyOrganizationInfo = asyncHandler(async (req, res) => {
   const organization = await Organization.findByPk(organization_id);
 
   if (!organization) {
-    throw new CustomError(`Organization with ID ${organization_id} not found.`, 404);
+    throw new CustomError(
+      `Organization with ID ${organization_id} not found.`,
+      404
+    );
   }
 
   // Update the organization with the new data
@@ -331,14 +339,17 @@ const getMyOrganizationPosition = asyncHandler(async (req, res) => {
   // Find all positions associated with the given organization_id
   const positions = await OrganizationPosition.findAll({
     where: { organization_id },
-    order: [['createdAt', 'ASC']], // Optional: order positions by creation time
+    order: [["createdAt", "ASC"]], // Optional: order positions by creation time
   });
 
   if (!positions.length) {
     // Check if the organization exists to provide a more specific error message
     const organizationExists = await Organization.findByPk(organization_id);
     if (!organizationExists) {
-      throw new CustomError(`Organization with ID ${organization_id} not found.`, 404);
+      throw new CustomError(
+        `Organization with ID ${organization_id} not found.`,
+        404
+      );
     }
   }
 
@@ -354,14 +365,17 @@ const createMyOrganizationPosition = asyncHandler(async (req, res) => {
   const { position_name } = req.body;
 
   // 1. Validate input
-  if (!position_name || position_name.trim() === '') {
+  if (!position_name || position_name.trim() === "") {
     throw new CustomError("Position name is required.", 400);
   }
 
   // 2. Verify that the organization exists
   const organization = await Organization.findByPk(organization_id);
   if (!organization) {
-    throw new CustomError(`Organization with ID ${organization_id} not found.`, 404);
+    throw new CustomError(
+      `Organization with ID ${organization_id} not found.`,
+      404
+    );
   }
 
   // 3. Create the new position
@@ -379,60 +393,220 @@ const createMyOrganizationPosition = asyncHandler(async (req, res) => {
 });
 
 const updateMyOrganizationPosition = asyncHandler(async (req, res) => {
-    const { organization_id, organization_position_id } = req.params;
-    const { position_name } = req.body;
+  const { organization_id, organization_position_id } = req.params;
+  const { position_name } = req.body;
 
-    // 1. Validate input
-    if (!position_name || position_name.trim() === '') {
-        throw new CustomError("Position name is required.", 400);
-    }
+  // 1. Validate input
+  if (!position_name || position_name.trim() === "") {
+    throw new CustomError("Position name is required.", 400);
+  }
 
-    // 2. Find the position, ensuring it belongs to the correct organization
-    const position = await OrganizationPosition.findOne({
-        where: {
-            organization_position_id,
-            organization_id,
-        },
-    });
+  // 2. Find the position, ensuring it belongs to the correct organization
+  const position = await OrganizationPosition.findOne({
+    where: {
+      organization_position_id,
+      organization_id,
+    },
+  });
 
-    if (!position) {
-        throw new CustomError(`Position with ID ${organization_position_id} not found in this organization.`, 404);
-    }
+  if (!position) {
+    throw new CustomError(
+      `Position with ID ${organization_position_id} not found in this organization.`,
+      404
+    );
+  }
 
-    // 3. Update the position name and save
-    position.position_name = position_name;
-    await position.save();
+  // 3. Update the position name and save
+  position.position_name = position_name;
+  await position.save();
 
-    // 4. Send a 200 OK response
-    res.status(200).json({
-        status: "success",
-        message: "Position updated successfully.",
-        data: position,
-    });
+  // 4. Send a 200 OK response
+  res.status(200).json({
+    status: "success",
+    message: "Position updated successfully.",
+    data: position,
+  });
 });
 
 const deleteMyOrganizationPosition = asyncHandler(async (req, res) => {
-    const { organization_id, organization_position_id } = req.params;
+  const { organization_id, organization_position_id } = req.params;
 
-    // 1. Find the position to ensure it exists before deleting
-    const position = await OrganizationPosition.findOne({
-        where: {
-            organization_position_id,
-            organization_id,
-        },
-    });
+  // 1. Find the position to ensure it exists before deleting
+  const position = await OrganizationPosition.findOne({
+    where: {
+      organization_position_id,
+      organization_id,
+    },
+  });
 
-    if (!position) {
-        throw new CustomError(`Position with ID ${organization_position_id} not found in this organization.`, 404);
-    }
+  if (!position) {
+    throw new CustomError(
+      `Position with ID ${organization_position_id} not found in this organization.`,
+      404
+    );
+  }
 
-    // 2. Delete the position
-    await position.destroy();
+  // 2. Delete the position
+  await position.destroy();
 
-    // 3. Send a 204 No Content response
-    res.status(204).send();
+  // 3. Send a 204 No Content response
+  res.status(204).send();
 });
 
+//for mysertifico
+
+const getAllMySertificoUsersHandler = asyncHandler(async (req, res) => {
+  const { organization_id } = req.params;
+  const { q, page = 1, limit = 10 } = req.query;
+  const offset = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+
+  const userWhereClause = {};
+  if (q) {
+    userWhereClause[Op.or] = [
+      { full_name: { [Op.like]: `%${q}%` } },
+      { email: { [Op.like]: `%${q}%` } },
+    ];
+  }
+
+  const { count, rows } = await UserOrganizationRole.findAndCountAll({
+    where: { organization_id },
+    limit: parseInt(limit, 10),
+    offset,
+    distinct: true,
+    include: [
+      {
+        model: User,
+        where: userWhereClause,
+        required: true,
+        attributes: {
+          exclude: ["password", "verify_token", "verify_token_expires_at"],
+        },
+      },
+      {
+        model: Role,
+        required: true,
+        attributes: ["role_name"],
+      },
+    ],
+    order: [[User, "createdAt", "DESC"]],
+  });
+
+  const users = rows.map((item) => ({
+    user_id: item.User.user_id,
+    full_name: item.User.full_name,
+    email: item.User.email,
+    is_active: item.is_active,
+    createdAt: item.User.createdAt,
+    role_name: item.Role.role_name,
+    assigned_at: item.assigned_at,
+  }));
+
+  res.status(200).json({
+    status: "success",
+    pagination: {
+      totalItems: count,
+      totalPages: Math.ceil(count / parseInt(limit, 10)),
+      currentPage: parseInt(page, 10),
+    },
+    data: users,
+  });
+});
+
+const updateMySertificoUser = asyncHandler(async (req, res) => {
+  const { organization_id, user_id } = req.params;
+  const { full_name, email, role_name, is_active } = req.body;
+
+  // Start a transaction to ensure both user and role updates are atomic
+  const transaction = await db.transaction();
+
+  try {
+    // 1. Find the UserOrganizationRole and the associated User record
+    const userOrgRole = await UserOrganizationRole.findOne({
+      where: { organization_id, user_id },
+      transaction,
+    });
+
+    if (!userOrgRole) {
+      throw new CustomError(
+        `User with ID ${user_id} not found in organization with ID ${organization_id}`,
+        404
+      );
+    }
+
+    // 2. Update the User model if full_name or email are provided
+    const user = await User.findByPk(user_id, { transaction });
+    if (!user) {
+      throw new CustomError("User not found.", 404);
+    }
+    const userUpdateData = {};
+    if (full_name) userUpdateData.full_name = full_name;
+    if (email) userUpdateData.email = email;
+    if (Object.keys(userUpdateData).length > 0) {
+      await user.update(userUpdateData, { transaction });
+    }
+
+    // 3. Update the UserOrganizationRole model if role_name or is_active are provided
+    if (role_name) {
+      const newRole = await Role.findOne({ where: { role_name }, transaction });
+      if (!newRole) {
+        throw new CustomError(`Role '${role_name}' not found.`, 404);
+      }
+      userOrgRole.role_id = newRole.role_id;
+    }
+    if (is_active !== undefined) {
+      userOrgRole.is_active = is_active;
+    }
+
+    await userOrgRole.save({ transaction });
+
+    // Commit the transaction if all updates were successful
+    await transaction.commit();
+
+    // Fetch the updated user and role information for the response
+    const updatedUserAndRole = await UserOrganizationRole.findOne({
+      where: { organization_id, user_id },
+      include: [
+        { model: User, attributes: ["full_name", "email"] },
+        { model: Role, attributes: ["role_name"] },
+      ],
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "User details updated successfully.",
+      data: {
+        user_id: updatedUserAndRole.user_id,
+        full_name: updatedUserAndRole.User.full_name,
+        email: updatedUserAndRole.User.email,
+        role_name: updatedUserAndRole.Role.role_name,
+        is_active: updatedUserAndRole.is_active,
+        assigned_at: updatedUserAndRole.assigned_at,
+      },
+    });
+  } catch (error) {
+    // Rollback the transaction on error
+    await transaction.rollback();
+    throw error;
+  }
+});
+
+
+const deleteMySertificoUser = asyncHandler(async (req, res) => {
+  const { organization_id, user_id } = req.params;
+
+  const deletedRowCount = await UserOrganizationRole.destroy({
+    where: { organization_id, user_id },
+  });
+
+  if (deletedRowCount === 0) {
+    throw new CustomError(
+      `User with ID ${user_id} not found in organization with ID ${organization_id}`,
+      404
+    );
+  }
+
+  res.status(204).end();
+});
 module.exports = {
   inviteUserHandler,
   getAllOrganization,
@@ -444,5 +618,10 @@ module.exports = {
   getMyOrganizationInfo,
   updateMyOrganizationInfo,
   getMyOrganizationPosition,
-  createMyOrganizationPosition
+  createMyOrganizationPosition,
+  updateMyOrganizationPosition,
+  deleteMyOrganizationPosition,
+  getAllMySertificoUsersHandler,
+  updateMySertificoUser,
+  deleteMySertificoUser,
 };
