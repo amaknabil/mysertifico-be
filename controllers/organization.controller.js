@@ -7,6 +7,9 @@ const {
   Role,
   Organization,
   OrganizationPosition,
+  Recipient,
+  Batch,
+  Profile,
 } = require("../models");
 const crypto = require("crypto");
 const bcryptjs = require("bcryptjs");
@@ -590,7 +593,6 @@ const updateMySertificoUser = asyncHandler(async (req, res) => {
   }
 });
 
-
 const deleteMySertificoUser = asyncHandler(async (req, res) => {
   const { organization_id, user_id } = req.params;
 
@@ -607,6 +609,89 @@ const deleteMySertificoUser = asyncHandler(async (req, res) => {
 
   res.status(204).end();
 });
+
+//handler for recipient in mysertifico
+const getRecipientsByOrganizationHandler = asyncHandler(
+  async (req, res, next) => {
+    const { organization_id } = req.params;
+
+    // 1. Find all batches for the given organization
+    const batches = await Batch.findAll({
+      where: { organization_id },
+      attributes: ["batch_id", "title"],
+    });
+
+    if (!batches || batches.length === 0) {
+      throw new CustomError(
+        `No certificate batches found for organization with ID ${organization_id}`,
+        404
+      );
+    }
+
+    // Extract batch_ids
+    const batchIds = batches.map((batch) => batch.batch_id);
+
+    // 2. Find all recipients for those batches, including the batch title
+    const recipients = await Recipient.findAll({
+      where: {
+        batch_id: {
+          [Op.in]: batchIds,
+        },
+      },
+      attributes: [
+        "recipient_id",
+        "national_id",
+        "recipient_name",
+        "recipient_class",
+      ],
+      include: [
+        {
+          model: Batch,
+          attributes: ["title"],
+          required: true,
+        },
+      ],
+    });
+
+    if (!recipients || recipients.length === 0) {
+      throw new CustomError(
+        `No recipients found for organization with ID ${organization_id}`,
+        404
+      );
+    }
+
+    // 3. Group certificates by person (using national_id or recipient_id as key)
+    const personMap = new Map();
+    recipients.forEach((recipient) => {
+      // Use national_id as the primary key for grouping.
+      // Fallback to recipient_id if national_id is null, for non-registered users.
+      const personKey = recipient.national_id || recipient.recipient_id;
+
+      if (!personMap.has(personKey)) {
+        personMap.set(personKey, {
+          national_id: recipient.national_id,
+          name: recipient.recipient_name,
+          class: recipient.recipient_class,
+          certificates: [],
+        });
+      }
+
+      personMap.get(personKey).certificates.push({
+        recipient_id: recipient.recipient_id,
+        batch_name: recipient.Batch.title,
+      });
+    });
+
+    // 4. Convert map values to an array for the final response
+    const result = Array.from(personMap.values());
+
+    res.status(200).json({
+      status: "success",
+      data: result,
+    });
+  }
+);
+
 module.exports = {
   inviteUserHandler,
   getAllOrganization,
@@ -614,14 +699,21 @@ module.exports = {
   getAllOrganizationUsersHandler,
   updateOrganizationUserStatusHandler,
 
-  //for mysertifico
+  //for mysertifico-info
   getMyOrganizationInfo,
   updateMyOrganizationInfo,
+
+  //mysertifico-position
   getMyOrganizationPosition,
   createMyOrganizationPosition,
   updateMyOrganizationPosition,
   deleteMyOrganizationPosition,
+
+  //mysertifico-user
   getAllMySertificoUsersHandler,
   updateMySertificoUser,
   deleteMySertificoUser,
+
+  //mysertifico-recipient
+  getRecipientsByOrganizationHandler,
 };

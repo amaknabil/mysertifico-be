@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // For Certificate Recipients
-      Profile.hasMany(models.Recipient, {foreignKey: "national_id",sourceKey: "national_id"});
+      // Profile.hasMany(models.Recipient, {foreignKey: "national_id",sourceKey: "national_id"});
       Profile.belongsTo(models.User, { foreignKey: "user_id" });
     }
   }
