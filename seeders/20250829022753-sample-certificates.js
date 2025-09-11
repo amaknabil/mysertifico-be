@@ -57,24 +57,48 @@ module.exports = {
         batch_id: BATCH_ID_1,
         national_id: ni_std_1, // Example recipient
         issued_at: new Date("2025-06-15 10:00:00"),
+        recipient_name:"Ahmad Nabil",
+        recipient_class:"5 Mawar",
       },
       {
         recipient_id: RECIPIENT_ID_2,
         batch_id: BATCH_ID_1,
         national_id: ni_std_2, // Example recipient
         issued_at: new Date("2025-06-15 10:00:00"),
+        recipient_name:"Nur Fazura",
+        recipient_class:"6 Keladi",
+      },
+      {
+        recipient_id: "d76ab639-6717-478d-ad7d-3e32161dfefc",
+        batch_id: BATCH_ID_1,
+        national_id: "010411030411", // Example recipient
+        issued_at: new Date("2025-06-15 10:00:00"),
+        recipient_name:"Masta Rob",
+        recipient_class:"4 Malik",
       },
       {
         recipient_id: RECIPIENT_ID_3,
         batch_id: BATCH_ID_2,
         national_id: ni_std_1, // Example recipient
         issued_at: new Date("2025-08-28 14:30:00"),
+        recipient_name:"Ahmad Nabil",
+        recipient_class:"5 Mawar",
       },
       {
         recipient_id: RECIPIENT_ID_4,
         batch_id: BATCH_ID_2,
         national_id: ni_std_2, // Example recipient
         issued_at: new Date("2025-08-28 14:30:00"),
+        recipient_name:"Nur Fazura",
+        recipient_class:"6 Keladi",
+      },
+      {
+        recipient_id: "e9876543-210a-b9c8-d7e6-f5a4b3c2d1e0",
+        batch_id: BATCH_ID_2,
+        national_id: "010411030411", // Example recipient
+        issued_at: new Date("2025-06-15 10:00:00"),
+        recipient_name:"Masta Rob",
+        recipient_class:"4 Malik",
       },
     ]);
   },
