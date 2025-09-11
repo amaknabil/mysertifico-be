@@ -61,12 +61,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: true,
       },
-      country_name: {
+      country_code: {
         type: DataTypes.STRING,
         allowNull: false,
         references: {
               model: 'countries',
-              key: 'country_name'
+              key: 'country_code'
                   }
       },
     },
